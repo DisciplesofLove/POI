@@ -1,0 +1,164 @@
+{
+    "abi": [
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_joyToken",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_poiContract",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_pouContract",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_minStake",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_heartbeatInterval",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "node",
+                    "type": "address"
+                }
+            ],
+            "name": "NodeDeactivated",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "node",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "capacity",
+                    "type": "uint256"
+                }
+            ],
+            "name": "NodeRegistered",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "bytes32",
+                    "name": "taskId",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "address[]",
+                    "name": "nodes",
+                    "type": "address[]"
+                }
+            ],
+            "name": "TaskAssigned",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "taskId",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "executionId",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "completeTask",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "modelId",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "createTask",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "node",
+                    "type": "address"
+                }
+            ],
+            "name": "deactivateNode",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "ip",
+                    "type": "string"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "computeCapacity",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "stakeAmount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "registerNode",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "sendHeartbeat",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+# Model marketplace configuration
+private_key: ${MARKETPLACE_KEY}
+web3_provider: "http://localhost:8545"
+marketplace_address: ${MARKETPLACE_ADDRESS}
+pou_address: ${POU_ADDRESS}
+
+# IPFS configuration
+ipfs_host: "localhost"
+ipfs_port: 5001
+
+# Model parameters
+min_price: 100000000000000  # 0.0001 JOY tokens
+max_price: 1000000000000000000  # 1 JOY token
+
+# Logging
+log_level: INFO
+log_file: "marketplace.log"

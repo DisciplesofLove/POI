@@ -1,0 +1,46 @@
+---
+# JoyNet Sovereign RPC Configuration
+
+# Network settings
+network:
+  name: "polygon-supernet"
+  chain_id: 1101
+  native_currency: "MATIC"
+  block_time: 2  # seconds
+
+# Node settings
+node:
+  host: ${RPC_HOST}
+  port: ${RPC_PORT}
+  ws_enabled: true
+  http_enabled: true
+  max_connections: 1000
+  max_subscribers: 100
+
+# Security
+security:
+  jwt_secret: ${JWT_SECRET}
+  rate_limit:
+    requests_per_second: 100
+    burst: 200
+  allowed_origins:
+    - "https://*.joynet.io"
+    - "https://app.joynet.io"
+  ssl:
+    enabled: true
+    cert_path: ${SSL_CERT_PATH}
+    key_path: ${SSL_KEY_PATH}
+
+# Performance
+performance:
+  cache_size_mb: 1024
+  max_blocks_behind: 100
+  sync_mode: "fast"
+  prune_mode: "archive"
+
+# Monitoring
+monitoring:
+  prometheus_enabled: true
+  metrics_port: 9090
+  log_level: "info"
+  health_check_port: 8545

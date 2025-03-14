@@ -1,0 +1,23 @@
+# Edge node configuration
+private_key: ${EDGE_NODE_KEY}
+web3_provider: "http://localhost:8545"
+coordinator_address: ${COORDINATOR_ADDRESS}
+poi_address: ${POI_ADDRESS}
+host: "0.0.0.0"
+port: 8080
+
+# IPFS configuration
+ipfs_host: "localhost"
+ipfs_port: 5001
+
+# Node parameters 
+min_stake: 1000000000000000000  # 1 JOY token
+heartbeat_interval: 60  # seconds
+
+# Model parameters
+model_load_timeout: 30  # seconds
+inference_timeout: 10   # seconds
+
+# Logging
+log_level: INFO
+log_file: "node.log"

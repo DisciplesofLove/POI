@@ -1,0 +1,69 @@
+type Profile @entity {
+  id: ID!
+  username: String
+  avatarUrl: String
+  bio: String
+  email: String
+  fullName: String
+  website: String
+  createdAt: BigInt!
+  updatedAt: BigInt!
+  listings: [Listing!]! @derivedFrom(field: "author")
+  reviews: [Review!]! @derivedFrom(field: "user")
+}
+
+type Listing @entity {
+  id: ID!
+  title: String!
+  description: String!
+  price: BigDecimal!
+  imageUrl: String
+  category: String!
+  features: [String!]
+  requirements: [String!]
+  useCases: [String!]
+  rating: BigDecimal
+  downloads: BigInt!
+  version: String
+  author: Profile!
+  tokenId: String
+  contractAddress: String
+  blockchain: String!
+  status: String!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+  reviews: [Review!]! @derivedFrom(field: "listing")
+  orders: [Order!]! @derivedFrom(field: "listing")
+}
+
+type Order @entity {
+  id: ID!
+  listing: Listing!
+  buyer: Profile!
+  seller: Profile!
+  amount: BigDecimal!
+  status: String!
+  transactionHash: String
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type Review @entity {
+  id: ID!
+  listing: Listing!
+  user: Profile!
+  rating: Int!
+  comment: String
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type Group @entity {
+  id: ID!
+  name: String!
+  description: String
+  creator: Profile!
+  members: [Profile!]!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
