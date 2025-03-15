@@ -1,18 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "POI",
 			"path": "."
 		},
 		{
+			"name": "JoyNet",
 			"path": "E:/Love AI/JoyNet"
 		},
 		{
+			"name": "smart-contracts",
 			"path": "../Desktop/Discord Bot/smart-contracts"
 		},
 		{
+			"name": "ultimate-sovereign-rpc-master-bundle",
 			"path": "E:/Love AI/ultimate-sovereign-rpc-master-bundle"
 		},
 		{
+			"name": "PermaNet_Full_Detailed_With_Playbook",
 			"path": "E:/Love AI/PermaNet_Full_Detailed_With_Playbook"
 		}
 	]
