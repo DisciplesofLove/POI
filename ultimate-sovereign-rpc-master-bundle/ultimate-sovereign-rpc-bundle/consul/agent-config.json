@@ -1,0 +1,14 @@
+{
+    "datacenter": "sovereign-rpc",
+    "node_name": "node{{ inventory_hostname }}",
+    "server": false,
+    "retry_join": ["node1", "node2", "node3"],
+    "services": [
+        {"name": "geth-sync", "port": 8545},
+        {"name": "bor-sync", "port": 8546},
+        {"name": "arbitrum-sync", "port": 8547},
+        {"name": "optimism-sync", "port": 8548},
+        {"name": "cosmos-sync", "port": 26657},
+        {"name": "solana-sync", "port": 8899}
+    ]
+}

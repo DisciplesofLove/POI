@@ -1,0 +1,84 @@
+---
+- name: Deploy Multi-Chain Sovereign Fleet
+  hosts: all
+  become: true
+  vars:
+    package_path: "/tmp/sovereign-rpc-multi-chain-fleet.zip"
+    extract_path: "/opt/sovereign-rpc-multi-chain-fleet"
+
+  tasks:
+    - name: Install necessary packages
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - ufw
+          - fail2ban
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Copy deployment package to server
+      copy:
+        src: "{{ package_path }}"
+        dest: "/tmp/sovereign-rpc-multi-chain-fleet.zip"
+
+    - name: Extract deployment package
+      unarchive:
+        src: "/tmp/sovereign-rpc-multi-chain-fleet.zip"
+        dest: "/opt"
+        remote_src: true
+
+    - name: Start Docker Compose stack
+      command: docker-compose up -d
+      args:
+        chdir: "{{ extract_path }}"
+
+    - name: Set up UFW firewall rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "22"
+        - "80"
+        - "443"
+        - "8545"
+        - "8546"
+        - "8547"
+        - "8548"
+        - "26657"
+        - "8899"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+    - name: Configure Fail2Ban for SSH
+      copy:
+        dest: "/etc/fail2ban/jail.local"
+        content: |
+          [sshd]
+          enabled = true
+          port = ssh
+          filter = sshd
+          logpath = /var/log/auth.log
+          maxretry = 5
+          bantime = 3600
+
+    - name: Restart Fail2Ban
+      systemd:
+        name: fail2ban
+        state: restarted
+
+    - name: Confirm running containers
+      command: docker ps
+      register: docker_status
+
+    - debug:
+        var: docker_status.stdout

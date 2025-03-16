@@ -1,0 +1,139 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JoyNet - The first decentralized marketplace for AI models, datasets, and services. Trade with confidence using blockchain technology.">
+    <meta name="keywords" content="AI marketplace, blockchain, NFT, machine learning, AI models, datasets, decentralized">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="JoyNet - Decentralized AI Marketplace">
+    <meta property="og:description" content="JoyNet - The first decentralized marketplace for AI models, datasets, and services. Trade with confidence using blockchain technology.">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JoyNet - Decentralized AI Marketplace">
+    <meta name="twitter:description" content="JoyNet - The first decentralized marketplace for AI models, datasets, and services. Trade with confidence using blockchain technology.">
+
+    <title>JoyNet - Decentralized AI Marketplace</title>
+
+    <!-- Web3.js - Add this before other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- React and Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/components.css" rel="stylesheet">
+    <link href="styles/forms.css" rel="stylesheet">
+    <link href="styles/animations.css" rel="stylesheet">
+    <link href="styles/utilities.css" rel="stylesheet">
+    <link rel="icon" href="https://app.trickle.so/storage/app/Joynetballv1.png">
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <!-- Supabase Client - Must be loaded first -->
+    <script src="utils/supabase/client.js" type="text/babel"></script>
+
+    <!-- Web3 Related -->
+    <script src="utils/web3.js" type="text/babel"></script>
+
+    <!-- Utils -->
+    <script src="utils/hooks/useAuth.js" type="text/babel"></script>
+    <script src="utils/hooks/useNotification.js" type="text/babel"></script>
+
+    <!-- Supabase Utils -->
+    <script src="utils/supabase/auth.js" type="text/babel"></script>
+    <script src="utils/supabase/profiles.js" type="text/babel"></script>
+    <script src="utils/supabase/listings.js" type="text/babel"></script>
+    <script src="utils/supabase/orders.js" type="text/babel"></script>
+    <script src="utils/supabase/reviews.js" type="text/babel"></script>
+    <script src="utils/supabase/messaging.js" type="text/babel"></script>
+
+    <!-- Components -->
+    <script src="components/ui/Button.js" type="text/babel"></script>
+    <script src="components/ui/Loader.js" type="text/babel"></script>
+    <script src="components/Navbar.js" type="text/babel"></script>
+    <script src="components/Hero.js" type="text/babel"></script>
+    <script src="components/SearchBar.js" type="text/babel"></script>
+    <script src="components/CategoryFilter.js" type="text/babel"></script>
+    <script src="components/ModelCard.js" type="text/babel"></script>
+    <script src="components/NFTCard.js" type="text/babel"></script>
+    <script src="components/ModelList.js" type="text/babel"></script>
+    <script src="components/ModelDetailModal.js" type="text/babel"></script>
+    <script src="components/Footer.js" type="text/babel"></script>
+    <script src="components/Newsletter.js" type="text/babel"></script>
+    <script src="components/FeaturedModels.js" type="text/babel"></script>
+    <script src="components/RecentModels.js" type="text/babel"></script>
+    <script src="components/TopModels.js" type="text/babel"></script>
+
+    <!-- Pages -->
+    <script src="pages/AIModelsPage.js" type="text/babel"></script>
+    <script src="pages/DatasetsPage.js" type="text/babel"></script>
+    <script src="pages/ServicesPage.js" type="text/babel"></script>
+    <script src="pages/AlgorithmsPage.js" type="text/babel"></script>
+    <script src="pages/NotFoundPage.js" type="text/babel"></script>
+    <script src="pages/HelpCenterPage.js" type="text/babel"></script>
+    <script src="pages/CaseStudiesPage.js" type="text/babel"></script>
+    <script src="pages/TutorialsPage.js" type="text/babel"></script>
+    <script src="pages/APIReferencePage.js" type="text/babel"></script>
+    <script src="pages/DocumentationPage.js" type="text/babel"></script>
+    <script src="pages/MembersPage.js" type="text/babel"></script>
+    <script src="pages/ChallengesPage.js" type="text/babel"></script>
+    <script src="pages/BlogPage.js" type="text/babel"></script>
+    <script src="pages/ForumsPage.js" type="text/babel"></script>
+    <script src="pages/CreateStore.js" type="text/babel"></script>
+    <script src="pages/TrainingPage.js" type="text/babel"></script>
+    <script src="pages/ContactPage.js" type="text/babel"></script>
+    <script src="pages/ProfilePage.js" type="text/babel"></script>
+    <script src="pages/DashboardPage.js" type="text/babel"></script>
+    <script src="pages/SettingsPage.js" type="text/babel"></script>
+    <script src="pages/StakingPage.js" type="text/babel"></script>
+
+    <!-- Community Components -->
+    <script src="components/community/ForumPost.js" type="text/babel"></script>
+    <script src="components/community/CreatePostForm.js" type="text/babel"></script>
+    <script src="components/community/GroupList.js" type="text/babel"></script>
+    <script src="components/community/GroupChat.js" type="text/babel"></script>
+
+    <!-- Settings Components -->
+    <script src="components/settings/NotificationsPanel.js" type="text/babel"></script>
+    <script src="components/settings/APIKeysPanel.js" type="text/babel"></script>
+    <script src="components/settings/PrivacyPanel.js" type="text/babel"></script>
+    <script src="components/settings/AppearancePanel.js" type="text/babel"></script>
+    <script src="components/settings/AIJobsPanel.js" type="text/babel"></script>
+    <script src="components/settings/ProfilePanel.js" type="text/babel"></script>
+    <script src="components/settings/AccountPanel.js" type="text/babel"></script>
+    <script src="components/settings/WalletPanel.js" type="text/babel"></script>
+
+    <!-- Chat Components -->
+    <script src="components/chat/ChatWidget.js" type="text/babel"></script>
+    <script src="components/chat/ChatHeader.js" type="text/babel"></script>
+    <script src="components/chat/ChatMessages.js" type="text/babel"></script>
+    <script src="components/chat/ChatInput.js" type="text/babel"></script>
+
+    <!-- AI Components -->
+    <script src="components/ai/AIAssistant.js" type="text/babel"></script>
+
+    <!-- Main App -->
+    <script src="app.js" type="text/babel"></script>
+
+
+</body>
+
+</html>

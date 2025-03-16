@@ -1,0 +1,66 @@
+version: "3.9"
+services:
+  geth:
+    image: ethereum/client-go:stable
+    volumes:
+      - ./data/geth:/root/.ethereum
+    ports:
+      - "8545:8545"
+    command: --syncmode snap --http --http.addr 0.0.0.0 --http.api eth,net,web3 --prune=5000
+    restart: unless-stopped
+
+  bor:
+    image: 0xpolygon/bor:latest
+    volumes:
+      - ./data/bor:/root/.bor
+    ports:
+      - "8546:8545"
+    command: server --http --http.addr 0.0.0.0 --http.api eth,net,web3 --syncmode full
+    restart: unless-stopped
+
+  arbitrum:
+    image: offchainlabs/nitro-node:latest
+    volumes:
+      - ./data/arbitrum:/home/user/.arbitrum
+    ports:
+      - "8547:8545"
+    command: nitro --http --http.addr=0.0.0.0
+    restart: unless-stopped
+
+  optimism:
+    image: optimism/geth:latest
+    volumes:
+      - ./data/optimism:/root/.optimism
+    ports:
+      - "8548:8545"
+    command: --http --http.addr 0.0.0.0 --http.api eth,net,web3
+    restart: unless-stopped
+
+  cosmos:
+    image: cosmossdk/gaia:latest
+    volumes:
+      - ./data/cosmos:/root/.gaia
+    ports:
+      - "26657:26657"
+    command: start
+    restart: unless-stopped
+
+  solana:
+    image: solanalabs/solana:latest
+    volumes:
+      - ./data/solana:/root/.solana
+    ports:
+      - "8899:8899"
+    command: validator --rpc-port 8899
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped

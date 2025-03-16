@@ -1,0 +1,13 @@
+rpc.loldao.ai {
+    reverse_proxy /eth http://geth:8545
+    reverse_proxy /polygon http://bor:8545
+    reverse_proxy /arbitrum http://arbitrum:8545
+    reverse_proxy /optimism http://optimism:8545
+    reverse_proxy /cosmos http://cosmos:26657
+    reverse_proxy /solana http://solana:8899
+
+    tls {
+        issuer letsencrypt
+    }
+    rate_limit 100 10s
+}

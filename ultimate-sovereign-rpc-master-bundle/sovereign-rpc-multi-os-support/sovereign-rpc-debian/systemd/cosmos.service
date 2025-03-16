@@ -1,0 +1,12 @@
+[Unit]
+Description=Cosmos Full Node
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/bin/docker compose -f /opt/sovereign-rpc/docker-compose.yml up cosmos
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target

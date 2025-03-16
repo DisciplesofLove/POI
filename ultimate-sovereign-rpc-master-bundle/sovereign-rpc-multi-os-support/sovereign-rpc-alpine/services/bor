@@ -1,0 +1,2 @@
+#!/bin/sh
+exec docker compose -f /opt/sovereign-rpc/docker-compose.yml up bor
