@@ -3,30 +3,31 @@ function ModelDetailModal({ model, onClose }) {
     const [tab, setTab] = React.useState('details'); // details, properties, history
     const { success, error: showError } = useNotification();
     const { currentUser } = useAuth();
-    const [showPayment, setShowPayment] = React.useState(false);
 
     async function handlePurchase() {
         try {
+            setLoading(true);
+            
             if (!currentUser) {
                 showError('Please connect your wallet to purchase this NFT');
                 return;
             }
-
-            setShowPayment(true);
+            
+            // In a real app, this would call the purchase API
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Simulate blockchain transaction
+            const txHash = "0x" + Math.random().toString(16).substring(2, 62);
+            
+            success(`Purchase successful! Transaction: ${txHash.substring(0, 6)}...${txHash.substring(txHash.length - 4)}`);
+            onClose();
         } catch (error) {
             console.error('Purchase failed:', error);
             reportError(error);
-            showError('Failed to initiate purchase');
+            showError('Failed to complete purchase');
+        } finally {
+            setLoading(false);
         }
-    }
-
-    function handlePaymentSuccess(order) {
-        // Close payment modal
-        setShowPayment(false);
-        // Close detail modal after a short delay
-        setTimeout(() => {
-            onClose();
-        }, 1500);
     }
 
     // Format blockchain timestamp
@@ -79,7 +80,144 @@ function ModelDetailModal({ model, onClose }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Left column content remains the same... */}
+                        <div className="space-y-4">
+                            <div className="aspect-square rounded-lg overflow-hidden">
+                                <img 
+                                    src={model.image}
+                                    alt={model.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            
+                            {/* Tab Navigation */}
+                            <div className="border-b border-white/10">
+                                <div className="flex space-x-6">
+                                    <button 
+                                        className={`pb-3 px-1 ${tab === 'details' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-white'}`}
+                                        onClick={() => setTab('details')}
+                                    >
+                                        Details
+                                    </button>
+                                    <button 
+                                        className={`pb-3 px-1 ${tab === 'properties' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-white'}`}
+                                        onClick={() => setTab('properties')}
+                                    >
+                                        Properties
+                                    </button>
+                                    <button 
+                                        className={`pb-3 px-1 ${tab === 'history' ? 'text-primary-light border-b-2 border-primary-light' : 'text-gray-400 hover:text-white'}`}
+                                        onClick={() => setTab('history')}
+                                    >
+                                        History
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Tab Content */}
+                            <div className="pt-2">
+                                {tab === 'details' && (
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-2">Description</h3>
+                                        <p className="text-gray-300">{model.description}</p>
+                                        
+                                        <div className="mt-4 pt-4 border-t border-white/10">
+                                            <h4 className="font-medium mb-2">Blockchain Details</h4>
+                                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                                <div>
+                                                    <p className="text-gray-400">Contract Address</p>
+                                                    <p className="font-mono">0xabc...def</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-gray-400">Token Standard</p>
+                                                    <p>ERC-721</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-gray-400">Blockchain</p>
+                                                    <p>Polygon</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-gray-400">Minted</p>
+                                                    <p>{formatDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {tab === 'properties' && (
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">CATEGORY</p>
+                                            <p className="font-semibold">{model.category?.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">RATING</p>
+                                            <p className="font-semibold">{model.rating} / 5.0</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">DOWNLOADS</p>
+                                            <p className="font-semibold">{model.downloads}</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">VERSION</p>
+                                            <p className="font-semibold">{model.version || '1.0'}</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">RARITY</p>
+                                            <p className="font-semibold">Uncommon</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3 text-center">
+                                            <p className="text-xs text-primary-light mb-1">ROYALTY</p>
+                                            <p className="font-semibold">10%</p>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {tab === 'history' && (
+                                    <div className="space-y-3">
+                                        {transactions.map((tx, index) => (
+                                            <div key={index} className="bg-white/5 rounded-lg p-3">
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <div className="flex items-center">
+                                                            <span className="text-sm font-semibold">{tx.type}</span>
+                                                            {tx.type === 'List' && (
+                                                                <span className="ml-2 px-2 py-0.5 bg-primary-main/20 text-primary-light rounded text-xs">
+                                                                    Active
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-gray-400 mt-1">
+                                                            {formatDate(tx.date)}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="flex items-center justify-end">
+                                                            <img 
+                                                                src="https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/svg/color/matic.svg" 
+                                                                alt="MATIC" 
+                                                                className="w-3 h-3 mr-1"
+                                                            />
+                                                            <span>{tx.price?.toFixed(2) || '-'} MATIC</span>
+                                                        </div>
+                                                        <div className="flex text-xs text-gray-400 mt-1">
+                                                            <span className="truncate w-20">
+                                                                {tx.from ? `From ${tx.from}` : ''}
+                                                            </span>
+                                                            {tx.to && (
+                                                                <span className="truncate w-20 text-right">
+                                                                    To {tx.to}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         <div className="space-y-6">
                             <div className="bg-white/5 p-4 rounded-lg">
@@ -109,12 +247,12 @@ function ModelDetailModal({ model, onClose }) {
                                     `}
                                 >
                                     {loading ? (
-                                        <span className="flex items-center">
+                                        <span className="flex items-center justify-center">
                                             <i className="fas fa-spinner fa-spin mr-2"></i>
                                             Processing...
                                         </span>
                                     ) : (
-                                        <span className="flex items-center">
+                                        <span className="flex items-center justify-center">
                                             <i className="fas fa-shopping-cart mr-2"></i>
                                             Buy Now
                                         </span>
@@ -128,20 +266,59 @@ function ModelDetailModal({ model, onClose }) {
                                 </div>
                             </div>
 
-                            {/* Rest of the right column content remains the same... */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2">Features</h3>
+                                <ul className="list-disc list-inside text-gray-300 space-y-1">
+                                    {model.features?.map((feature, index) => (
+                                        <li key={index}>{feature}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="bg-white/5 p-4 rounded-lg">
+                                <h3 className="font-semibold mb-3">Creator</h3>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-white/10 overflow-hidden mr-3">
+                                        <img 
+                                            src={`https://avatars.dicebear.com/api/identicon/${model.author || 'unknown'}.svg`}
+                                            alt="Creator"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium">{model.author || 'Unknown Creator'}</h4>
+                                        <p className="text-xs text-gray-400">
+                                            {model.authorVerified ? 'Verified Creator' : 'Creator'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-white/10">
+                                <h3 className="text-lg font-semibold mb-4">Technical Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white/5 p-4 rounded-lg">
+                                        <h4 className="font-medium mb-2">Requirements</h4>
+                                        <ul className="text-sm text-gray-400 space-y-1">
+                                            {model.requirements?.map((req, index) => (
+                                                <li key={index}>{req}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="bg-white/5 p-4 rounded-lg">
+                                        <h4 className="font-medium mb-2">Use Cases</h4>
+                                        <ul className="text-sm text-gray-400 space-y-1">
+                                            {model.useCases?.map((useCase, index) => (
+                                                <li key={index}>{useCase}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Payment Modal */}
-            {showPayment && (
-                <PaymentModal 
-                    model={model}
-                    onClose={() => setShowPayment(false)}
-                    onSuccess={handlePaymentSuccess}
-                />
-            )}
         </div>
     );
 }
