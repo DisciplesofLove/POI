@@ -1,0 +1,82 @@
+import React, { useState, useEffect, useRef } from 'react';
+import VideoGrid from './VideoGrid';
+import VideoCallControls from './VideoCallControls';
+import { sendIceCandidate, reconnectPeer } from '../../utils/webrtc-helpers';
+
+export default function GroupChat({ group, currentUser }) {
+    const [messages, setMessages] = useState([]);
+    const [messageInput, setMessageInput] = useState('');
+    const [isVideoCallActive, setIsVideoCallActive] = useState(false);
+    const [localStream, setLocalStream] = useState(null);
+    const [remoteStreams, setRemoteStreams] = useState({});
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [loading, setLoading] = useState(false);
+    
+    const peerConnections = useRef({});
+    const dataChannels = useRef({});
+    const mediaStream = useRef(null);
+
+    // Rest of your existing code...
+
+    const handleToggleAudio = () => {
+        if (mediaStream.current) {
+            const audioTracks = mediaStream.current.getAudioTracks();
+            audioTracks.forEach(track => {
+                track.enabled = !isAudioEnabled;
+            });
+            setIsAudioEnabled(!isAudioEnabled);
+        }
+    };
+
+    const handleToggleVideo = () => {
+        if (mediaStream.current) {
+            const videoTracks = mediaStream.current.getVideoTracks();
+            videoTracks.forEach(track => {
+                track.enabled = !isVideoEnabled;
+            });
+            setIsVideoEnabled(!isVideoEnabled);
+        }
+    };
+
+    const handleEndCall = () => {
+        if (mediaStream.current) {
+            mediaStream.current.getTracks().forEach(track => track.stop());
+        }
+        setIsVideoCallActive(false);
+        setLocalStream(null);
+        setRemoteStreams({});
+    };
+
+    // Cleanup effect for media streams
+    useEffect(() => {
+        return () => {
+            if (mediaStream.current) {
+                mediaStream.current.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
+    return (
+        <div className="flex flex-col h-full">
+            {isVideoCallActive && (
+                <>
+                    <VideoGrid
+                        localStream={localStream}
+                        remoteStreams={remoteStreams}
+                    />
+                    <VideoCallControls
+                        onToggleAudio={handleToggleAudio}
+                        onToggleVideo={handleToggleVideo}
+                        onEndCall={handleEndCall}
+                        isAudioEnabled={isAudioEnabled}
+                        isVideoEnabled={isVideoEnabled}
+                    />
+                </>
+            )}
+            <div className="flex-1 overflow-y-auto p-4">
+                {/* Rest of your existing chat UI */}
+            </div>
+        </div>
+    );
+}
