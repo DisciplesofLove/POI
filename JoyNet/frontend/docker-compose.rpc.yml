@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - RPC_ENDPOINT=http://geth:8545
+      - POLYGON_RPC_ENDPOINT=http://bor:8545
+    depends_on:
+      - geth
+      - bor
+
+  geth:
+    extends:
+      file: ../../ultimate-sovereign-rpc-master-bundle/ultimate-sovereign-rpc-bundle/docker-compose.yml
+      service: geth
+
+  bor:
+    extends:
+      file: ../../ultimate-sovereign-rpc-master-bundle/ultimate-sovereign-rpc-bundle/docker-compose.yml
+      service: polygon-bor
+
+  caddy:
+    extends:
+      file: ../../ultimate-sovereign-rpc-master-bundle/ultimate-sovereign-rpc-bundle/docker-compose.yml
+      service: caddy

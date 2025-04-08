@@ -1,0 +1,33 @@
+monitoring:
+  node_monitor:
+    contract_address: ${NODE_MONITOR_ADDRESS}
+    update_interval: 60  # seconds
+    health_threshold: 95
+    max_response_time: 1000  # milliseconds
+    metrics:
+      enabled: true
+      port: 9090
+      path: /metrics
+  
+  alerts:
+    slack:
+      enabled: ${SLACK_ALERTS_ENABLED}
+      webhook_url: ${SLACK_WEBHOOK_URL}
+    email:
+      enabled: ${EMAIL_ALERTS_ENABLED}
+      smtp_host: ${SMTP_HOST}
+      smtp_port: ${SMTP_PORT}
+      from_address: ${ALERT_FROM_EMAIL}
+      to_address: ${ALERT_TO_EMAIL}
+
+  thresholds:
+    node_health:
+      critical: 80
+      warning: 90
+    response_time:
+      critical: 2000  # milliseconds
+      warning: 1000   # milliseconds
+
+  retention:
+    metrics_retention_days: 30
+    logs_retention_days: 7

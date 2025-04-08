@@ -1,85 +1,79 @@
-# Decentralized AI Inference Platform
+# PermaNet Unified Platform
 
-This project implements a decentralized platform for AI model inference, using blockchain for coordination and verification.
+A unified platform combining AI model marketplace, domain management, and RPC services.
 
-## Components
+## Features
 
-- Smart Contracts
-  - JoyToken (ERC20): Platform token for payments and staking
-  - ProofOfInference: Validates model execution with zero-knowledge proofs
-  - ProofOfUse: Tracks model usage and rewards
-  - NodeCoordinator: Manages edge computing nodes
-  - ModelMarketplace: Marketplace for AI models
-  - ZKVerifier: Verifies zero-knowledge proofs
+- AI Model Marketplace
+- Domain Name Registration
+- Multi-chain RPC Support
+- Token Staking
+- Community Features
 
-- Python Components
-  - EdgeNode: Edge computing node implementation
-  - InferenceNode: Base class for model execution
-  - ModelMarketplace: Client for model marketplace
-  - ZKProver: Generates zero-knowledge proofs
+## Setup Instructions
 
-## Setup
-
-1. Install dependencies:
+1. Clone the repository:
 ```bash
-pip install -r requirements.txt
+git clone <repository-url>
+cd permanet
 ```
 
-2. Deploy contracts:
+2. Install dependencies:
 ```bash
-python scripts/deploy.py
+cd JoyNet/frontend
+npm install
 ```
 
-3. Start an edge node:
+3. Set up environment variables:
 ```bash
-python -m src.edge_node
+cp .env.local.example .env.local
+# Edit .env.local with your configuration
 ```
 
-## Usage
-
-1. Register a model:
-```python
-from src.model_marketplace import ModelMarketplace
-
-marketplace = ModelMarketplace(private_key, contract_address)
-marketplace.register_model(model_id, metadata, price)
-```
-
-2. Execute inference:
-```python
-from src.inference_node import InferenceNode
-
-node = InferenceNode(private_key, contract_address)
-result = node.execute_inference(model_id, input_data)
-```
-
-## Development
-
-Run tests:
+4. Set up RPC services:
 ```bash
-pytest tests/
+cd JoyNet/frontend
+docker-compose -f docker-compose.rpc.yml up -d
 ```
 
-## Architecture
+5. Start the development server:
+```bash
+npm run dev
+```
 
-1. Model Registration
-   - Models are registered on the marketplace with metadata and pricing
-   - Model files are stored on IPFS
-   
-2. Edge Node Network
-   - Nodes stake tokens and register with coordinator
-   - Tasks are distributed based on capacity and load
-   
-3. Inference Execution
-   - Input data is processed by edge nodes
-   - ZK proofs verify correct execution
-   - Results are validated by PoI system
-   
-4. Payments and Rewards
-   - Users pay in JOY tokens for inference
-   - Node operators earn from execution fees
-   - Model owners earn from usage fees
+## Configuration
+
+### RPC Configuration
+- Edit `docker-compose.rpc.yml` to configure RPC endpoints
+- Default ports:
+  - ETH RPC: 8545
+  - Polygon RPC: 8546
+
+### Smart Contract Deployment
+1. Deploy the Domain Registry contract
+2. Update `NEXT_PUBLIC_DOMAIN_REGISTRY_ADDRESS` in `.env.local`
+
+## Directory Structure
+
+```
+JoyNet/
+├── frontend/          # Main frontend application
+│   ├── components/    # React components
+│   ├── pages/         # Next.js pages
+│   ├── utils/        # Utility functions
+│   └── styles/       # CSS and styling
+├── contracts/         # Smart contracts
+└── scripts/          # Deployment and utility scripts
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+Distributed under the MIT License. See `LICENSE` for more information.

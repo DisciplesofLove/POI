@@ -1,0 +1,18 @@
+p2p:
+  bootstrap_nodes:
+    - "/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+    - "/ip4/104.236.176.52/tcp/4001/p2p/QmSoLnSGccFuZQJzRadHn95W2CrSFmZuTdDWP8HXaHca9z"
+    - "/ip4/104.236.179.241/tcp/4001/p2p/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM"
+
+ipfs:
+  swarm_key: "/key/swarm/psk/1.0.0/\n/base16/\n8920e34d45f7e74b40a2bf6843f2ebf6e8d6a05163791f53e2dc48c75abf4322"
+  
+consensus:
+  min_peers: 3
+  consensus_threshold: 0.67  # 2/3 majority needed
+  max_latency: 5000  # ms
+  
+discovery:
+  interval: 60  # seconds
+  max_peers: 50
+  min_peers: 10
