@@ -1,5 +1,5 @@
 """
-Edge Computing Node Implementation
+Edge Computing Node Implementation with Sovereign RPC
 """
 import asyncio
 import json
@@ -12,6 +12,7 @@ from eth_typing import Address
 
 from .inference_node import InferenceNode
 from .zk_prover import ZKProver
+from .sovereign_rpc_node import SovereignRPCNode
 
 class EdgeNode(InferenceNode):
     def __init__(
@@ -19,6 +20,7 @@ class EdgeNode(InferenceNode):
         private_key: str,
         coordinator_address: Address,
         poi_address: Address,
+        rpc_config_path: str,
         web3_provider: str = "http://localhost:8545",
         host: str = "0.0.0.0",
         port: int = 8080
@@ -30,13 +32,18 @@ class EdgeNode(InferenceNode):
         self.port = port
         self.active_tasks: Dict[str, asyncio.Task] = {}
         
-    def _load_coordinator(self, address: Address):
-        """Load the NodeCoordinator contract."""
-        # Contract ABI would be imported here
-        pass
+        # Initialize sovereign RPC node
+        self.rpc_node = SovereignRPCNode(
+            private_key=private_key,
+            config_path=rpc_config_path,
+            web3_provider=web3_provider
+        )
         
     async def start(self):
         """Start the edge computing node."""
+        # Start RPC node first
+        await self.rpc_node.start()
+        
         # Register with coordinator
         compute_capacity = self._get_compute_capacity()
         stake_amount = Web3.to_wei(1000, 'ether')  # 1000 JOY tokens
@@ -55,75 +62,36 @@ class EdgeNode(InferenceNode):
         signed_tx = self.web3.eth.account.sign_transaction(tx, self.account.key)
         await self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
         
-        # Start heartbeat
+        # Start background tasks
         asyncio.create_task(self._heartbeat_loop())
-        
-        # Start task processing
         asyncio.create_task(self._process_tasks())
         
-    async def _heartbeat_loop(self):
-        """Send regular heartbeats to coordinator."""
-        while True:
-            try:
-                tx = self.coordinator_contract.functions.sendHeartbeat().build_transaction({
-                    'from': self.account.address,
-                    'gas': 100000,
-                    'gasPrice': self.web3.eth.gas_price,
-                    'nonce': self.web3.eth.get_transaction_count(self.account.address)
-                })
-                
-                signed_tx = self.web3.eth.account.sign_transaction(tx, self.account.key)
-                await self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
-                
-            except Exception as e:
-                logging.error(f"Heartbeat failed: {e}")
-                
-            await asyncio.sleep(60)  # Send heartbeat every minute
-            
-    async def _process_tasks(self):
-        """Process assigned computation tasks."""
-        while True:
-            try:
-                # Check for new tasks
-                events = self.coordinator_contract.events.TaskAssigned.get_logs(
-                    fromBlock=self.web3.eth.block_number - 100
-                )
-                
-                for event in events:
-                    task_id = event['args']['taskId']
-                    nodes = event['args']['nodes']
-                    
-                    # Check if we're assigned to this task
-                    if self.account.address in nodes and task_id not in self.active_tasks:
-                        self.active_tasks[task_id] = asyncio.create_task(
-                            self._execute_task(task_id)
-                        )
-                        
-            except Exception as e:
-                logging.error(f"Task processing failed: {e}")
-                
-            await asyncio.sleep(5)
-            
-    async def _execute_task(self, task_id: str):
-        """Execute an assigned computation task."""
+    async def _load_model_from_ipfs(self, model_id: str):
+        """Load an AI model from IPFS using sovereign RPC."""
         try:
-            # Get task details
-            task = self.coordinator_contract.functions.tasks(task_id).call()
-            
-            # Load model if not already loaded
-            if task['modelId'] not in self.models:
-                await self._load_model_from_ipfs(task['modelId'])
+            # Retrieve model data through RPC node
+            model_data = await self.rpc_node.retrieve_data(model_id)
+            if not model_data:
+                raise ValueError(f"Model {model_id} not found")
                 
-            # Execute inference
-            result = await self.execute_inference(
-                task['modelId'],
-                await self._get_input_data(task_id)
+            # Load model
+            model = torch.load(model_data)
+            model.eval()
+            if torch.cuda.is_available():
+                model = model.cuda()
+            self.models[model_id] = model
+            
+            # Store proof of model loading
+            proof = self.zk_prover.generate_proof(
+                model_id,
+                model_data,
+                self.account.address
             )
             
-            # Complete task
-            tx = self.coordinator_contract.functions.completeTask(
-                task_id,
-                result['executionId']
+            # Record on chain
+            tx = self.poi_contract.functions.recordModelLoad(
+                Web3.to_bytes(hexstr=model_id),
+                proof
             ).build_transaction({
                 'from': self.account.address,
                 'gas': 200000,
@@ -135,10 +103,79 @@ class EdgeNode(InferenceNode):
             await self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
             
         except Exception as e:
-            logging.error(f"Task execution failed: {e}")
+            logging.error(f"Failed to load model {model_id}: {e}")
+            raise
             
-        finally:
-            del self.active_tasks[task_id]
+    async def _get_input_data(self, task_id: str) -> Dict[str, Any]:
+        """Get input data for a task using sovereign RPC."""
+        # Get task info from coordinator
+        task = self.coordinator_contract.functions.tasks(task_id).call()
+        
+        if not task or not task['modelId']:
+            raise ValueError(f"Task {task_id} not found")
+            
+        # Retrieve input data through RPC node
+        input_data = await self.rpc_node.retrieve_data(task['inputCid'])
+        if not input_data:
+            raise ValueError(f"Input data not found for task {task_id}")
+            
+        # Convert to tensor if needed
+        if not isinstance(input_data, torch.Tensor):
+            input_data = torch.tensor(input_data)
+            
+        return {
+            'data': input_data,
+            'task_id': task_id,
+            'model_id': task['modelId']
+        }
+        
+    async def execute_inference(self, model_id: str, input_data: Any) -> Dict[str, Any]:
+        """Execute model inference with proofs."""
+        if model_id not in self.models:
+            await self._load_model_from_ipfs(model_id)
+            
+        model = self.models[model_id]
+        
+        with torch.no_grad():
+            # Run inference
+            if torch.cuda.is_available():
+                input_data = input_data.cuda()
+            output_data = model(input_data)
+            
+            # Generate proof
+            proof = self.zk_prover.generate_proof(
+                model_id,
+                input_data,
+                output_data
+            )
+            
+            # Store result through RPC node
+            result_cid = await self.rpc_node.store_data({
+                'output': output_data.cpu().numpy().tolist(),
+                'proof': proof.hex()
+            })
+            
+            # Record on chain
+            tx = self.poi_contract.functions.recordInference(
+                Web3.to_bytes(hexstr=model_id),
+                Web3.to_bytes(hexstr=result_cid),
+                proof
+            ).build_transaction({
+                'from': self.account.address,
+                'gas': 300000,
+                'gasPrice': self.web3.eth.gas_price,
+                'nonce': self.web3.eth.get_transaction_count(self.account.address)
+            })
+            
+            signed_tx = self.web3.eth.account.sign_transaction(tx, self.account.key)
+            tx_hash = await self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            
+            return {
+                'output': output_data.cpu().numpy(),
+                'result_cid': result_cid,
+                'proof': proof.hex(),
+                'tx_hash': tx_hash.hex()
+            }
             
     def _get_compute_capacity(self) -> int:
         """Get the node's compute capacity in FLOPS."""
@@ -150,33 +187,3 @@ class EdgeNode(InferenceNode):
             # Get CPU compute capacity
             import multiprocessing
             return multiprocessing.cpu_count() * 100000  # Rough estimate
-            
-    async def _load_model_from_ipfs(self, model_id: str):
-        """Load an AI model from IPFS."""
-        # Implementation would use IPFS client to fetch model
-        pass
-        
-    async def _get_input_data(self, task_id: str) -> Dict[str, Any]:
-        """Get input data for a task from IPFS or other storage.
-        
-        Args:
-            task_id: Task identifier
-            
-        Returns:
-            Dictionary containing input data
-        """
-        # Get task info from coordinator
-        task = self.coordinator_contract.functions.tasks(task_id).call()
-        
-        # In a real implementation, this would fetch data from IPFS or similar
-        # For now return dummy data matching expected model input shape
-        if task and task['modelId']:
-            return {
-                'data': torch.randn(1, 3, 224, 224), # Dummy image tensor
-                'task_id': task_id,
-                'model_id': task['modelId']
-            }
-        raise ValueError(f"Task {task_id} not found")
-        """Get input data for a task."""
-        # Implementation would fetch input data from IPFS or other storage
-        pass
