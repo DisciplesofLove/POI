@@ -16,22 +16,30 @@ class TestSecretsManager(unittest.TestCase):
             'pou_contract_address': '0xabc'
         }
 
-    @patch('boto3.session.Session')
-    def test_get_secret(self, mock_session):
+    @patch('utils.crypto_vault.CryptoVault')
+    def test_get_secret(self, mock_crypto_vault):
         # Setup mock
-        mock_client = MagicMock()
-        mock_session.return_value.client.return_value = mock_client
-        mock_client.get_secret_value.return_value = {
-            'SecretString': '{"test": "value"}'
-        }
-
+        mock_vault_instance = MagicMock()
+        mock_crypto_vault.return_value = mock_vault_instance
+        mock_vault_instance.retrieve_vault.return_value = (b'encrypted_data', b'salt')
+        mock_vault_instance.decrypt_vault.return_value = {'test': 'value'}
+        mock_vault_instance.verify_vault_integrity.return_value = True
+        
+        # Set environment variable for test
+        os.environ['VAULT_PASSPHRASE'] = 'test_passphrase'
+        
         # Test
         secrets_manager = SecretsManager()
-        result = secrets_manager.get_secret('test-secret')
-
+        secrets_manager._cached_ipfs_hash = 'test_hash'
+        result = secrets_manager.get_secret('test')
+        
         # Assert
-        self.assertEqual(result, {'test': 'value'})
-        mock_client.get_secret_value.assert_called_once_with(SecretId='test-secret')
+        self.assertEqual(result, 'value')
+        mock_vault_instance.retrieve_vault.assert_called_once_with('test_hash')
+        mock_vault_instance.decrypt_vault.assert_called_once_with(b'encrypted_data', 'test_passphrase', b'salt')
+        
+        # Clean up
+        del os.environ['VAULT_PASSPHRASE']
 
 class TestConfigLoader(unittest.TestCase):
     def setUp(self):

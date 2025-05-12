@@ -1,0 +1,47 @@
+groups:
+- name: p2p_alerts
+  rules:
+  - alert: NodeDown
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "P2P Node down"
+      description: "P2P node has been down for more than 5 minutes."
+
+  - alert: HighLatency
+    expr: request_duration_seconds > 5
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High latency detected"
+      description: "Request latency is above 5 seconds for more than 10 minutes."
+
+  - alert: LowReplication
+    expr: data_replication_factor < 3
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low data replication"
+      description: "Data replication factor is below 3 for more than 1 hour."
+
+  - alert: HighMemoryUsage
+    expr: process_resident_memory_bytes / (1024 * 1024 * 1024) > 2
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage"
+      description: "Node is using more than 2GB of memory for more than 15 minutes."
+
+  - alert: HighCPUUsage
+    expr: rate(process_cpu_seconds_total[5m]) > 0.8
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"
+      description: "Node CPU usage is above 80% for more than 15 minutes."

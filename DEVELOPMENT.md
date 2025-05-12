@@ -161,12 +161,7 @@ pytest tests/integration/
 
 ## Deployment
 
-### AWS Deployment
-1. Configure AWS credentials
-2. Update `buildspec.yml` with your configuration
-3. Push to the deployment branch
-
-### Docker Deployment
+### Decentralized Deployment
 1. Build the Docker image:
 ```bash
 docker build -t permanet .
@@ -175,6 +170,19 @@ docker build -t permanet .
 2. Run the container:
 ```bash
 docker run -p 3000:3000 permanet
+```
+
+3. Join the P2P network:
+```bash
+python -m src.p2p.node_network
+```
+
+4. For multi-node deployment:
+```bash
+# On each node
+export NODE_ID=$(openssl rand -hex 8)
+export BOOTSTRAP_PEERS=/ip4/x.x.x.x/tcp/4001/p2p/QmBootstrapPeerID
+python -m src.p2p.node_network --bootstrap $BOOTSTRAP_PEERS
 ```
 
 ## Troubleshooting

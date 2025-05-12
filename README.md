@@ -33,6 +33,7 @@ cd permanet
 pip install -r requirements.txt
 cd unified-frontend
 npm install
+cd ..
 ```
 
 3. Set up environment variables:
@@ -41,17 +42,18 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-4. Set up RPC services:
+4. Start the decentralized node:
 ```bash
-cd ultimate-sovereign-rpc-master-bundle
-docker-compose up -d
+docker-compose -f deployment/docker-compose.yml up
 ```
 
-5. Start the development server:
+5. For development mode:
 ```bash
 cd unified-frontend
 npm run dev
 ```
+
+For detailed deployment instructions, see [DECENTRALIZED_DEPLOYMENT.md](deployment/DECENTRALIZED_DEPLOYMENT.md)
 
 ## Smart Contract Deployment
 
@@ -106,8 +108,9 @@ npx hardhat run scripts/deploy.js --network <your-network>
 The platform includes:
 - Security measures with proper authentication and authorization
 - Performance optimizations for sub-100ms latency
-- Monitoring and observability setup
-- High availability configuration
+- Decentralized monitoring and observability setup
+- High availability through peer redundancy
+- Fully decentralized deployment with no centralized dependencies
 
 ## Documentation
 
