@@ -1,4 +1,4 @@
-# PermaNet Unified Platform
+# JoyNet Unified Platform
 
 A decentralized platform combining AI model marketplace, domain management, and RPC services with community governance features.
 
