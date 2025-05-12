@@ -14,7 +14,7 @@ A decentralized platform combining AI model marketplace, domain management, and 
 
 ## Architecture Overview
 
-PermaNet is built on a fully decentralized architecture with the following components:
+JoyNet is built on a fully decentralized architecture with the following components:
 
 - **P2P Network Layer**: libp2p for peer-to-peer communication
 - **Storage Layer**: IPFS for decentralized model and data storage
