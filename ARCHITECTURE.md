@@ -59,43 +59,38 @@ The SovereignRPC system provides decentralized RPC services with:
 - JWT authentication
 - Node health monitoring
 
-## Community DNS Integration
+## AI Model Marketplace
 
-The PermaNet marketplace ecosystem has been enhanced to support community ownership of internet domains through the following components:
+The PermaNet marketplace ecosystem has been enhanced with the following components:
 
 ### Key Components
-- **PermaNetDomainRegistry**: Manages the core domain registration system including TLDs and subdomains
-- **PermaNetDAORegistry**: Enables community governance of TLDs through DAOs
-- **ModelMarketplaceV2**: Handles the marketplace functionality including model registration and usage
-- **PermaNetMarketplaceAdapter**: Bridges domains, DAOs, and marketplace functionality
+- **ModelMarketplace**: Handles the marketplace functionality including model registration and usage
+- **ModelFusionContract**: Manages composite AI models and royalty distribution
+- **ProofOfInference**: Validates model execution
+- **NodeCoordinator**: Manages node selection and coordination
 
-### How It Works
-1. Top-Level Domains (TLDs) can be owned by:
-   - Individual owners
-   - DAO communities (through PermaNetDAORegistry)
+### Model Fusion Engine
 
-2. When a TLD is controlled by a DAO:
-   - Community members can stake tokens to participate in governance
-   - Domain registrations must be approved through DAO voting
-   - The community can set policies and manage the TLD collectively
+The Model Fusion Engine is a key component that enables developers to combine complementary AI systems:
 
-3. Models in the marketplace can be:
-   - Associated with domains
-   - Updated and managed by their owners
-   - Integrated with the IOTA network for secure data streaming
+#### Architecture
+- **Compatibility Analysis**: AI-powered system that analyzes model compatibility
+- **Connection Configuration**: Framework for defining interaction points between models
+- **Performance Testing**: Benchmarking system to evaluate fused model performance
+- **Royalty Distribution**: Smart contract-based system for fair attribution and compensation
 
-### Community Benefits
-- Decentralized governance of internet namespaces
-- Democratic decision-making for domain registrations
-- Integration of AI models with permanent web infrastructure
-- Community-driven policies and standards
+#### Workflow
+1. **Model Discovery**: Users select complementary models from the marketplace
+2. **Compatibility Check**: System analyzes technical compatibility between models
+3. **Connection Configuration**: Users define how models will interact
+4. **Performance Testing**: Combined model is tested against benchmarks
+5. **Deployment**: Fused model is deployed with proper attribution and royalty distribution
 
-### Technical Integration
-The PermaNetMarketplaceAdapter acts as the bridge between these systems:
-- Verifies domain availability and ownership
-- Checks DAO governance requirements for domain registration
-- Links marketplace models with permanent domains
-- Ensures proper access control and permissions
+#### Technical Implementation
+- **Smart Contracts**: ModelFusionContract handles ownership, royalties, and usage tracking
+- **Backend Services**: Python-based fusion engine handles compatibility analysis and testing
+- **Frontend Interface**: React-based UI for model selection and configuration
+- **Storage**: IPFS for storing model metadata and connection configurations
 
 ## Performance Optimizations
 

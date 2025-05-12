@@ -5,6 +5,7 @@ A decentralized platform combining AI model marketplace, domain management, and 
 ## Features
 
 - **AI Model Marketplace**: Buy, sell, and execute AI models with secure inference
+- **Model Fusion Engine**: Combine complementary AI models to create powerful composite systems
 - **Domain Name Registration**: Community-owned TLDs and domain management
 - **Multi-chain RPC Support**: Decentralized RPC services with SovereignRPC
 - **Token Staking**: Earn rewards through JoyToken staking
@@ -88,6 +89,7 @@ npx hardhat run scripts/deploy.js --network <your-network>
 
 ### Smart Contracts
 - **ModelMarketplace**: Handles model registration, purchases, and royalties
+- **ModelFusionContract**: Manages composite AI models and royalty distribution
 - **PermaNetDomainRegistry**: Manages domain registration and ownership
 - **SovereignRPC**: Decentralized RPC node management
 - **JoyToken**: Platform utility token with staking functionality
@@ -100,8 +102,18 @@ npx hardhat run scripts/deploy.js --network <your-network>
 ### Frontend
 - Web3 wallet integration
 - Model marketplace UI
+- Model Fusion Engine interface
 - Domain management interface
 - Staking and governance features
+
+## Model Fusion Engine
+
+The Model Fusion Engine enables developers to combine complementary AI systems to create powerful composite models:
+
+- **Discover Compatible Models**: AI-powered recommendation system identifies complementary models
+- **Configure Connection Points**: Define how models interact with automated compatibility checking
+- **Test Combined Performance**: Evaluate fused models against benchmarks
+- **Deploy as New Entity**: Launch composite models with proper attribution and royalty distribution
 
 ## Production Readiness
 
