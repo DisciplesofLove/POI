@@ -1,6 +1,6 @@
-# JoyNet Decentralized Infrastructure
+# Joy AI Marketplace Decentralized Infrastructure
 
-A fully decentralized, highly available, and scalable infrastructure that powers the JoyNet ecosystem — AI models, data, domains, and user assets — leveraging a built-in RPC system without external pinning dependencies.
+A fully decentralized, highly available, and scalable infrastructure that powers the .Joy ecosystem — AI models, data, domains, and user assets — leveraging a built-in RPC system without external pinning dependencies.
 
 ## Core Principles
 
@@ -147,7 +147,7 @@ npx hardhat coverage
 
 ## Governance
 
-### JoyNet DAO
+### Joy DAO
 
 - Controls platform parameters
 - Manages treasury
@@ -196,6 +196,6 @@ MIT License - see LICENSE file for details
 
 ## Contact
 
-- Website: https://joynet.network
-- Email: support@joynet.network
+- Website: https://joymarketplace.io
+- Email: support@joymarketplace.io
 - Discord: https://discord.gg/joynet
