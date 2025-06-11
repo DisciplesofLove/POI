@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # Core JoyNet node
+  joynet-node:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: joynet/node:latest
+    container_name: joynet-node
+    restart: unless-stopped
+    ports:
+      - "9000:9000"      # P2P port
+      - "8000:8000"      # API port
+    volumes:
+      - joynet-data:/data
+    environment:
+      - NODE_TYPE=full   # full, validator, or light
+      - LOG_LEVEL=info
+    networks:
+      - joynet-network
+    depends_on:
+      - ipfs
+    command: ["start", "--config", "/data/node_config.json", "--data-dir", "/data"]
+
+  # IPFS node for decentralized storage
+  ipfs:
+    image: ipfs/go-ipfs:v0.12.0
+    container_name: joynet-ipfs
+    restart: unless-stopped
+    ports:
+      - "4001:4001"      # IPFS swarm
+      - "5001:5001"      # IPFS API
+      - "8080:8080"      # IPFS Gateway
+    volumes:
+      - ipfs-data:/data/ipfs
+    environment:
+      - IPFS_PROFILE=server
+      - IPFS_PATH=/data/ipfs
+    networks:
+      - joynet-network
+    command: ["daemon", "--enable-pubsub-experiment"]
+
+  # Prometheus for decentralized monitoring
+  prometheus:
+    image: prom/prometheus:v2.35.0
+    container_name: joynet-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../config/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - prometheus-data:/prometheus
+    networks:
+      - joynet-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:8.5.0
+    container_name: joynet-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=joynet
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - joynet-network
+    depends_on:
+      - prometheus
+
+  # Validator node (optional)
+  joynet-validator:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: joynet/node:latest
+    container_name: joynet-validator
+    restart: unless-stopped
+    ports:
+      - "9001:9000"      # P2P port
+    volumes:
+      - joynet-validator-data:/data
+    environment:
+      - NODE_TYPE=validator
+      - LOG_LEVEL=info
+    networks:
+      - joynet-network
+    depends_on:
+      - ipfs
+      - joynet-node
+    command: ["start", "--config", "/data/node_config.json", "--data-dir", "/data"]
+    profiles:
+      - validator
+
+  # Alertmanager for decentralized alerts
+  alertmanager:
+    image: prom/alertmanager:v0.24.0
+    container_name: joynet-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ../config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    networks:
+      - joynet-network
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    profiles:
+      - monitoring
+
+volumes:
+  joynet-data:
+  joynet-validator-data:
+  ipfs-data:
+  prometheus-data:
+  grafana-data:
+  alertmanager-data:
+
+networks:
+  joynet-network:
+    driver: bridge
