@@ -32,5 +32,5 @@ if [ ! -z "$VAULT_PASSPHRASE" ] && [ ! -z "$INIT_VAULT" ]; then
     python -m src.utils.crypto_vault --init
 fi
 
-echo "Starting PermaNet node..."
+echo "Starting JoyNet node..."
 exec "$@"

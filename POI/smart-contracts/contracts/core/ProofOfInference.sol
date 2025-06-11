@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./PermaNetDomainRegistry.sol";
+import "./JoyNetDomainRegistry.sol";
 import "./ProofOfIntegrity.sol";
 
 /**
@@ -12,7 +12,7 @@ import "./ProofOfIntegrity.sol";
  * @dev Manages Proof of Inference (POInf) for AI model usage
  */
 contract ProofOfInference is Ownable, ReentrancyGuard {
-    PermaNetDomainRegistry public domainRegistry;
+    JoyNetDomainRegistry public domainRegistry;
     ProofOfIntegrity public poiContract;
     IERC20 public joyToken;
     
@@ -69,7 +69,7 @@ contract ProofOfInference is Ownable, ReentrancyGuard {
         address _poiContract,
         address _joyToken
     ) {
-        domainRegistry = PermaNetDomainRegistry(_domainRegistry);
+        domainRegistry = JoyNetDomainRegistry(_domainRegistry);
         poiContract = ProofOfIntegrity(_poiContract);
         joyToken = IERC20(_joyToken);
     }

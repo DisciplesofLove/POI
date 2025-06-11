@@ -1,6 +1,6 @@
 # Decentralized Deployment Guide
 
-This guide provides instructions for deploying PermaNet in a fully decentralized manner without any centralized cloud services.
+This guide provides instructions for deploying JoyNet in a fully decentralized manner without any centralized cloud services.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ For testing or development purposes:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd permanet
+cd joynet
 
 # Install dependencies
 pip install -r requirements.txt

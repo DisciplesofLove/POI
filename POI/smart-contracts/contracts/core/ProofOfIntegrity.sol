@@ -3,14 +3,14 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./PermaNetDomainRegistry.sol";
+import "./JoyNetDomainRegistry.sol";
 
 /**
  * @title ProofOfIntegrity
  * @dev Manages Proof of Integrity (POI) for data and models
  */
 contract ProofOfIntegrity is Ownable, ReentrancyGuard {
-    PermaNetDomainRegistry public domainRegistry;
+    JoyNetDomainRegistry public domainRegistry;
     
     struct IntegrityProof {
         string ipfsHash;             // IPFS content hash

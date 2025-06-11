@@ -4,15 +4,15 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./PermaNetDomainRegistry.sol";
+import "./JoyNetDomainRegistry.sol";
 
 /**
- * @title PermaNetDAORegistry
- * @dev Manages TLD DAOs and governance for PermaNet domains
+ * @title JoyNetDAORegistry
+ * @dev Manages TLD DAOs and governance for JoyNet domains
  */
-contract PermaNetDAORegistry is Ownable, ReentrancyGuard {
+contract JoyNetDAORegistry is Ownable, ReentrancyGuard {
     // Main domain registry contract
-    PermaNetDomainRegistry public domainRegistry;
+    JoyNetDomainRegistry public domainRegistry;
     
     // Governance token
     IERC20 public governanceToken;
@@ -54,7 +54,7 @@ contract PermaNetDAORegistry is Ownable, ReentrancyGuard {
     event ProposalExecuted(string tld, uint256 proposalId);
     
     constructor(address _domainRegistry, address _governanceToken) {
-        domainRegistry = PermaNetDomainRegistry(_domainRegistry);
+        domainRegistry = JoyNetDomainRegistry(_domainRegistry);
         governanceToken = IERC20(_governanceToken);
     }
     

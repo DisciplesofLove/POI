@@ -26,7 +26,7 @@ JoyNet is built on a fully decentralized architecture with the following compone
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd permanet
+cd joynet
 ```
 
 2. Install dependencies:
@@ -75,14 +75,17 @@ npx hardhat run scripts/deploy.js --network <your-network>
 │   ├── pages/           # Next.js pages
 │   ├── utils/           # Utility functions including Web3 integration
 │   └── hooks/           # React hooks for blockchain interaction
-├── contracts/           # Smart contracts
+├── contracts/           # Smart contracts and deployment scripts
 ├── src/                 # Backend services and P2P network
 │   ├── p2p/             # P2P networking components
 │   ├── middleware/      # API middleware
 │   ├── services/        # Core services
 │   └── utils/           # Utility functions
+├── deployment/          # Deployment configurations and scripts
 ├── config/              # Configuration files
-└── docs/                # Documentation
+├── models/             # AI model definitions and configurations
+├── scripts/            # Utility scripts
+└── smart-contracts/    # Additional smart contract implementations
 ```
 
 ## Key Components

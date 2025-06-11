@@ -1,4 +1,4 @@
-# Multi-stage build for PermaNet decentralized platform
+# Multi-stage build for JoyNet decentralized platform
 
 # Stage 1: Build frontend
 FROM node:16-alpine AS frontend-builder

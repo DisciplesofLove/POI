@@ -1,6 +1,6 @@
-# PermaNet Unified Frontend
+# JoyNet Unified Frontend
 
-This is the unified TypeScript/React frontend for the PermaNet platform, combining AI model marketplace, domain management, and RPC services with community governance features.
+This is the unified TypeScript/React frontend for the JoyNet platform, combining AI model marketplace, domain management, and RPC services with community governance features.
 
 ## Features
 

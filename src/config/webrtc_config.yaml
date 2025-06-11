@@ -1,22 +1,46 @@
 webrtc:
+  use_internal_servers: true  # Use our own STUN/TURN implementation
   stun_servers:
-    - urls: 'stun:stun.l.google.com:19302'
-    - urls: 'stun:stun1.l.google.com:19302'
-    - urls: 'stun:stun2.l.google.com:19302'
-    - urls: 'stun:stun3.l.google.com:19302'
-    - urls: 'stun:stun.stunprotocol.org:3478'
-    - urls: 'stun:stun.voip.blackberry.com:3478'
+    - urls: 'stun:{host}:3478'  # Will be replaced with actual host
   turn_servers:
-    - urls: 'turn:openrelay.metered.ca:80'
-      username: 'openrelayproject'
-      credential: 'openrelayproject'
-    - urls: 'turn:openrelay.metered.ca:443'
-      username: 'openrelayproject'
-      credential: 'openrelayproject'
-    - urls: 'turn:open.relay.metered.ca:4445?transport=tcp'
-      username: 'openrelayproject'
-      credential: 'openrelayproject'
+    - urls: 'turn:{host}:3479'  # Will be replaced with actual host
+      username: '{username}'     # Will be replaced with generated credentials
+      credential: '{password}'   # Will be replaced with generated credentials
   ice_transport_policy: 'all'
   bundle_policy: 'balanced'
   rtcp_mux_policy: 'require'
   ice_candidate_pool_size: 10
+  
+  # Storage configuration for messages and files
+  storage:
+    ipfs:
+      enabled: true
+      pin_files: true  # Keep files available
+      max_file_size: 104857600  # 100MB
+      allowed_mime_types:
+        - image/*
+        - application/pdf
+        - text/*
+        - application/msword
+        - application/vnd.openxmlformats-officedocument.*
+    
+    message_retention:
+      enabled: true
+      store_messages: true
+      encryption: true
+      max_age_days: 30  # How long to keep messages
+      
+  # AI analysis configuration
+  ai_analysis:
+    enabled: true
+    analyze_on_upload: true
+    supported_types:
+      - text/plain
+      - image/*
+      - application/pdf
+    features:
+      - content_moderation
+      - text_classification
+      - image_recognition
+      - document_analysis
+      - sentiment_analysis

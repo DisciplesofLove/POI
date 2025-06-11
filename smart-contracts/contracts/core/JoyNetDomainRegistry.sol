@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
- * @title PermaNetDomainRegistry
- * @dev Manages permanent domain registration for the PermaNet decentralized internet
+ * @title JoyNetDomainRegistry
+ * @dev Manages permanent domain registration for the JoyNet decentralized internet
  */
-contract PermaNetDomainRegistry is Ownable, ReentrancyGuard {
+contract JoyNetDomainRegistry is Ownable, ReentrancyGuard {
     using Strings for uint256;
 
     // Struct to store domain information

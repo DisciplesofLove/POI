@@ -1,8 +1,8 @@
-# PermaNet Architecture
+# JoyNet Architecture
 
 ## Overview
 
-PermaNet is a decentralized platform that combines AI model marketplace, domain management, and RPC services with community governance features. The architecture is designed to be fully decentralized, scalable, and secure, with a focus on user data ownership, privacy protection, and fair monetization.
+JoyNet is a decentralized platform that combines AI model marketplace, domain management, and RPC services with community governance features. The architecture is designed to be fully decentralized, scalable, and secure, with a focus on user data ownership, privacy protection, and fair monetization. This document provides a comprehensive overview of the system architecture and its components.
 
 ## Core Components
 
@@ -116,7 +116,11 @@ The system includes optimizations for sub-100ms latency:
 
 1. Start the P2P network:
 ```bash
-python -m src.p2p.node_network
+# Initialize the node
+python -m src.p2p.node_network init
+
+# Start the node service
+python -m src.p2p.node_network start
 ```
 
 2. Initialize IPFS:
@@ -125,18 +129,29 @@ ipfs init
 ipfs daemon
 ```
 
-3. Deploy SovereignRPC contract:
+3. Deploy smart contracts:
 ```bash
-truffle migrate --network development
+# Deploy core contracts
+cd contracts
+npx hardhat run scripts/deploy.js --network development
+
+# Deploy RPC contracts
+cd ../smart-contracts
+npx hardhat run scripts/deploy-rpc.js --network development
 ```
 
 4. Start the application:
 ```bash
+# Start backend services
+docker-compose -f deployment/docker-compose.yml up -d
+
+# Start frontend development server
 cd unified-frontend
 npm run dev
 ```
 
 ## Configuration Files
-- `p2p_config.yaml`: P2P network settings
-- `truffle-config.js`: Blockchain configuration
+- `config/p2p_config.yaml`: P2P network settings
+- `config/hardhat.config.js`: Smart contract deployment configuration
+- `deployment/docker-compose.yml`: Container orchestration
 - `.env`: Environment variables

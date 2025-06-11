@@ -1,13 +1,13 @@
 # Development Guide
 
-This document provides comprehensive information for developers working on the PermaNet platform.
+This document provides comprehensive information for developers working on the JoyNet platform.
 
 ## Development Environment Setup
 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd permanet
+cd joynet
 ```
 
 2. Install dependencies:
@@ -164,25 +164,43 @@ pytest tests/integration/
 ### Decentralized Deployment
 1. Build the Docker image:
 ```bash
-docker build -t permanet .
+docker build -t joynet .
 ```
 
-2. Run the container:
+2. Deploy using docker-compose:
 ```bash
-docker run -p 3000:3000 permanet
+docker-compose -f deployment/docker-compose.yml up -d
 ```
 
-3. Join the P2P network:
+3. Initialize and join the P2P network:
 ```bash
-python -m src.p2p.node_network
+# Initialize the node
+python -m src.p2p.node_network init
+
+# Start the node service
+python -m src.p2p.node_network start
 ```
 
 4. For multi-node deployment:
 ```bash
-# On each node
+# On bootstrap node
+export NODE_ROLE=bootstrap
+docker-compose -f deployment/docker-compose.yml up -d
+
+# On worker nodes
+export NODE_ROLE=worker
 export NODE_ID=$(openssl rand -hex 8)
 export BOOTSTRAP_PEERS=/ip4/x.x.x.x/tcp/4001/p2p/QmBootstrapPeerID
-python -m src.p2p.node_network --bootstrap $BOOTSTRAP_PEERS
+docker-compose -f deployment/docker-compose.yml up -d
+```
+
+5. Verify deployment:
+```bash
+# Check node status
+curl http://localhost:3000/api/health
+
+# Verify P2P connections
+python -m src.p2p.tools.network_status
 ```
 
 ## Troubleshooting
