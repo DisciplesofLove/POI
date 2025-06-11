@@ -2,7 +2,7 @@
 
 ## Overview
 
-PermaNet is a decentralized platform that combines AI model marketplace, domain management, and RPC services with community governance features. The architecture is designed to be fully decentralized, scalable, and secure.
+PermaNet is a decentralized platform that combines AI model marketplace, domain management, and RPC services with community governance features. The architecture is designed to be fully decentralized, scalable, and secure, with a focus on user data ownership, privacy protection, and fair monetization.
 
 ## Core Components
 
