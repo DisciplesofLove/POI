@@ -25,6 +25,19 @@ contract ModelMarketplace is Ownable {
         mapping(uint256 => bytes32) modelIds; // Array of model IDs in the store
     }
 
+    // Structure to store user contract information
+    struct UserContract {
+        address owner;
+        string name;
+        string version;
+        address deployedAddress;
+        string sourceCodeHash;  // IPFS hash of the contract source code
+        string abiHash;        // IPFS hash of the contract ABI
+        bool isVerified;
+        uint256 createdAt;
+        uint256 lastUpdated;
+    }
+
     // Structure to store model information
     struct Model {
         address owner;
@@ -42,6 +55,7 @@ contract ModelMarketplace is Ownable {
         uint256 createdAt;
         uint256 lastUpdated;
         bytes32 storeId;      // ID of the store this model belongs to
+        bytes32[] contracts;  // Associated smart contracts
     }
     
     // Mapping of model IDs to their info
@@ -52,6 +66,12 @@ contract ModelMarketplace is Ownable {
     
     // Mapping of address to their store IDs
     mapping(address => bytes32) public ownerToStore;
+
+    // Mapping of contract IDs to their info
+    mapping(bytes32 => UserContract) public userContracts;
+    
+    // Mapping of address to their contract IDs
+    mapping(address => bytes32[]) public ownerToContracts;
     
     // Events
     event StoreCreated(bytes32 indexed storeId, address indexed owner, string name);
@@ -60,6 +80,10 @@ contract ModelMarketplace is Ownable {
     event ModelUpdated(bytes32 indexed modelId, string name, string version);
     event ModelUsed(bytes32 indexed modelId, bytes32 indexed executionId);
     event ModelDeactivated(bytes32 indexed modelId);
+    event ContractRegistered(bytes32 indexed contractId, address indexed owner, string name);
+    event ContractUpdated(bytes32 indexed contractId, string name, string version);
+    event ContractDeployed(bytes32 indexed contractId, address deployedAddress);
+    event ContractVerified(bytes32 indexed contractId);
     
     constructor(address _joyToken, address _pouContract) {
         joyToken = IERC20(_joyToken);
@@ -272,5 +296,125 @@ contract ModelMarketplace is Ownable {
         require(msg.sender == model.owner || msg.sender == owner(), "Not authorized");
         model.isActive = false;
         emit ModelDeactivated(modelId);
+    }
+
+    /**
+     * @dev Register a new smart contract
+     */
+    function registerContract(
+        bytes32 contractId,
+        string memory name,
+        string memory version,
+        string memory sourceCodeHash,
+        string memory abiHash
+    ) external {
+        require(userContracts[contractId].owner == address(0), "Contract ID already exists");
+        
+        userContracts[contractId] = UserContract({
+            owner: msg.sender,
+            name: name,
+            version: version,
+            deployedAddress: address(0),
+            sourceCodeHash: sourceCodeHash,
+            abiHash: abiHash,
+            isVerified: false,
+            createdAt: block.timestamp,
+            lastUpdated: block.timestamp
+        });
+        
+        ownerToContracts[msg.sender].push(contractId);
+        emit ContractRegistered(contractId, msg.sender, name);
+    }
+
+    /**
+     * @dev Update contract information
+     */
+    function updateContract(
+        bytes32 contractId,
+        string memory name,
+        string memory version,
+        string memory sourceCodeHash,
+        string memory abiHash
+    ) external {
+        UserContract storage userContract = userContracts[contractId];
+        require(msg.sender == userContract.owner, "Not contract owner");
+        
+        userContract.name = name;
+        userContract.version = version;
+        userContract.sourceCodeHash = sourceCodeHash;
+        userContract.abiHash = abiHash;
+        userContract.lastUpdated = block.timestamp;
+        
+        emit ContractUpdated(contractId, name, version);
+    }
+
+    /**
+     * @dev Set deployed contract address
+     */
+    function setContractAddress(bytes32 contractId, address deployedAddress) external {
+        UserContract storage userContract = userContracts[contractId];
+        require(msg.sender == userContract.owner, "Not contract owner");
+        require(userContract.deployedAddress == address(0), "Contract already deployed");
+        
+        userContract.deployedAddress = deployedAddress;
+        emit ContractDeployed(contractId, deployedAddress);
+    }
+
+    /**
+     * @dev Mark contract as verified
+     */
+    function verifyContract(bytes32 contractId) external onlyOwner {
+        UserContract storage userContract = userContracts[contractId];
+        require(!userContract.isVerified, "Contract already verified");
+        
+        userContract.isVerified = true;
+        emit ContractVerified(contractId);
+    }
+
+    /**
+     * @dev Get contract information
+     */
+    function getContractInfo(bytes32 contractId) external view returns (
+        address owner,
+        string memory name,
+        string memory version,
+        address deployedAddress,
+        string memory sourceCodeHash,
+        string memory abiHash,
+        bool isVerified,
+        uint256 createdAt,
+        uint256 lastUpdated
+    ) {
+        UserContract storage userContract = userContracts[contractId];
+        return (
+            userContract.owner,
+            userContract.name,
+            userContract.version,
+            userContract.deployedAddress,
+            userContract.sourceCodeHash,
+            userContract.abiHash,
+            userContract.isVerified,
+            userContract.createdAt,
+            userContract.lastUpdated
+        );
+    }
+
+    /**
+     * @dev Get user's contracts
+     */
+    function getUserContracts(address user) external view returns (bytes32[] memory) {
+        return ownerToContracts[user];
+    }
+
+    /**
+     * @dev Associate a contract with a model
+     */
+    function associateContractWithModel(bytes32 modelId, bytes32 contractId) external {
+        Model storage model = models[modelId];
+        UserContract storage userContract = userContracts[contractId];
+        require(msg.sender == model.owner, "Not model owner");
+        require(userContract.owner == msg.sender, "Not contract owner");
+        
+        model.contracts.push(contractId);
     }
 }
