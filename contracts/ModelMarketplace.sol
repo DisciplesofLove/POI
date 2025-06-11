@@ -10,11 +10,12 @@ import "./ProofOfUse.sol";
  * @dev Decentralized marketplace for AI models with personal stores and detailed model information
  */
 contract ModelMarketplace is Ownable {
-    // Token used for payments
+    // Core contracts
     IERC20 public joyToken;
-    
-    // Proof of Use contract for tracking model usage
     ProofOfUse public pouContract;
+    ModelLicense public licenseContract;
+    MarketplaceGovernance public governanceContract;
+    RevenueLogger public revenueLogger;
     
     // Structure to store store information
     struct Store {
@@ -85,9 +86,18 @@ contract ModelMarketplace is Ownable {
     event ContractDeployed(bytes32 indexed contractId, address deployedAddress);
     event ContractVerified(bytes32 indexed contractId);
     
-    constructor(address _joyToken, address _pouContract) {
+    constructor(
+        address _joyToken,
+        address _pouContract,
+        address _licenseContract,
+        address _governanceContract,
+        address _revenueLogger
+    ) {
         joyToken = IERC20(_joyToken);
         pouContract = ProofOfUse(_pouContract);
+        licenseContract = ModelLicense(_licenseContract);
+        governanceContract = MarketplaceGovernance(_governanceContract);
+        revenueLogger = RevenueLogger(_revenueLogger);
     }
     
     /**
@@ -205,19 +215,37 @@ contract ModelMarketplace is Ownable {
     /**
      * @dev Pay for model usage and record execution
      */
-    function useModel(bytes32 modelId, bytes32 executionId) external {
+    function useModel(bytes32 modelId, bytes32 executionId, uint256 licenseId) external {
         Model storage model = models[modelId];
         require(model.isActive, "Model not active");
         
-        // Transfer payment
-        require(
-            joyToken.transferFrom(msg.sender, model.owner, model.price),
-            "Payment failed"
-        );
+        // Verify license if provided
+        if (licenseId > 0) {
+            require(licenseContract.ownerOf(licenseId) == msg.sender, "Not license owner");
+            require(licenseContract.isValidLicense(licenseId), "Invalid license");
+            licenseContract.recordUsage(licenseId);
+        } else {
+            // Pay per use if no license
+            require(
+                joyToken.transferFrom(msg.sender, model.owner, model.price),
+                "Payment failed"
+            );
+        }
         
         // Update usage stats
         model.totalUses++;
         model.revenue += model.price;
+        
+        // Log revenue
+        bytes32 txHash = keccak256(abi.encodePacked(modelId, executionId, block.timestamp));
+        revenueLogger.logRevenue(
+            txHash,
+            modelId,
+            model.owner,
+            msg.sender,
+            model.price,
+            model.price * governanceContract.platformFee() / 10000
+        );
         
         emit ModelUsed(modelId, executionId);
     }
