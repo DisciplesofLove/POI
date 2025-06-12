@@ -16,3 +16,6 @@ transformers>=4.30.0
 pillow>=9.5.0
 pytesseract>=0.3.10
 pdfplumber>=0.9.0
+requests>=2.31.0
+filecoin-api-client>=0.1.0
+arweave-python>=1.0.0
