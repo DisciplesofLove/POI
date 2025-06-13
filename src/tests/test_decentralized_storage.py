@@ -42,12 +42,22 @@ def mock_arweave():
         yield (mock_get, mock_head)
 
 @pytest.fixture
-def storage(mock_ipfs):
+def mock_cdn():
+    with patch('web3.Web3') as mock_web3:
+        web3 = Mock()
+        mock_web3.HTTPProvider.return_value = Mock()
+        mock_web3.return_value = web3
+        yield web3
+
+@pytest.fixture
+def storage(mock_ipfs, mock_cdn):
     return DecentralizedStorage(
         ipfs_host="localhost",
         ipfs_port=5001,
         filecoin_token="test_token",
-        arweave_keyfile="test_keyfile"
+        arweave_keyfile="test_keyfile",
+        web3_provider="http://localhost:8545",
+        cdn_contract="0x1234567890"
     )
 
 def test_ipfs_provider(mock_ipfs):
@@ -156,12 +166,26 @@ def test_decentralized_storage_model_operations(storage, mock_ipfs):
 def test_storage_duration_validation(storage):
     test_data = b"test data"
     
-    # Valid duration should work
-    storage.store(test_data, StorageDuration.SHORT_TERM)
+    # Test all valid durations
+    valid_durations = [
+        StorageDuration.SHORT_TERM,
+        StorageDuration.MID_TERM,
+        StorageDuration.LONG_TERM,
+        StorageDuration.EDGE_CACHED
+    ]
     
-    # Invalid duration should raise error
+    for duration in valid_durations:
+        try:
+            storage.store(test_data, duration)
+        except Exception as e:
+            pytest.fail(f"Storage with duration {duration} failed: {str(e)}")
+    
+    # Test invalid duration
+    class InvalidDuration(StorageDuration):
+        INVALID = "invalid"
+        
     with pytest.raises(ValueError):
-        storage.retrieve("test", StorageDuration.MID_TERM)
+        storage.store(test_data, InvalidDuration.INVALID)
         
 def test_tensor_conversion(storage, mock_ipfs):
     # Test tensor storage

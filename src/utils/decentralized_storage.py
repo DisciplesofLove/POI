@@ -21,6 +21,7 @@ class StorageDuration(Enum):
     SHORT_TERM = "short"  # IPFS - hours to days
     MID_TERM = "mid"      # Filecoin - months
     LONG_TERM = "long"    # Arweave - years/permanent
+    EDGE_CACHED = "edge"  # Blockchain CDN - edge cached
 
 class StorageProvider(ABC):
     @abstractmethod
@@ -153,7 +154,9 @@ class DecentralizedStorage:
                  ipfs_host: str = "localhost",
                  ipfs_port: int = 5001,
                  filecoin_token: Optional[str] = None,
-                 arweave_keyfile: Optional[str] = None):
+                 arweave_keyfile: Optional[str] = None,
+                 web3_provider: Optional[str] = None,
+                 cdn_contract: Optional[str] = None):
         
         self.providers = {
             StorageDuration.SHORT_TERM: IPFSProvider(ipfs_host, ipfs_port)
@@ -164,6 +167,12 @@ class DecentralizedStorage:
             
         if arweave_keyfile:
             self.providers[StorageDuration.LONG_TERM] = ArweaveProvider(arweave_keyfile)
+            
+        if web3_provider and cdn_contract:
+            from .blockchain_cdn import BlockchainCDNProvider
+            self.providers[StorageDuration.EDGE_CACHED] = BlockchainCDNProvider(
+                web3_provider, cdn_contract
+            )
             
     def store(self, 
              data: Union[bytes, BinaryIO, torch.Tensor],

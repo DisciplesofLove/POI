@@ -5,10 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/governance/Governor.sol";
 import "./ProofOfUse.sol";
 import "./interfaces/IIOTAValidator.sol";
+import "./EthicalAIRegistry.sol";
 
 /**
  * @title ModelMarketplaceV2
- * @dev Decentralized marketplace for AI models with IOTA integration
+ * @dev Decentralized marketplace for AI models with IOTA integration and ethical AI enforcement
  */
 contract ModelMarketplaceV2 {
     // Token used for governance
@@ -19,6 +20,9 @@ contract ModelMarketplaceV2 {
     
     // IOTA validator interface
     IIOTAValidator public iotaValidator;
+    
+    // Ethical AI Registry
+    EthicalAIRegistry public ethicsRegistry;
     
     // DAO address for governance
     address public daoGovernor;
@@ -32,6 +36,7 @@ contract ModelMarketplaceV2 {
         uint256 totalUses;
         uint256 revenue;
         string iotaStreamId;  // IOTA Streams channel ID for this model
+        bool ethicsApproved;  // Whether model meets ethical standards
     }
     
     // Mapping of model IDs to their info
@@ -41,6 +46,7 @@ contract ModelMarketplaceV2 {
     event ModelRegistered(bytes32 indexed modelId, address indexed owner, string iotaStreamId);
     event ModelUsed(bytes32 indexed modelId, bytes32 indexed executionId, string iotaMessageId);
     event ModelDeactivated(bytes32 indexed modelId);
+    event EthicsStatusUpdated(bytes32 indexed modelId, bool approved);
     
     modifier onlyDAO() {
         require(msg.sender == daoGovernor, "Only DAO can perform this action");
@@ -51,11 +57,13 @@ contract ModelMarketplaceV2 {
         address _joyToken,
         address _pouContract,
         address _iotaValidator,
+        address _ethicsRegistry,
         address _daoGovernor
     ) {
         joyToken = IERC20(_joyToken);
         pouContract = ProofOfUse(_pouContract);
         iotaValidator = IIOTAValidator(_iotaValidator);
+        ethicsRegistry = EthicalAIRegistry(_ethicsRegistry);
         daoGovernor = _daoGovernor;
     }
     
@@ -75,7 +83,8 @@ contract ModelMarketplaceV2 {
             isActive: true,
             totalUses: 0,
             revenue: 0,
-            iotaStreamId: iotaStreamId
+            iotaStreamId: iotaStreamId,
+            ethicsApproved: false  // Models start as unapproved until reviewed
         });
         
         emit ModelRegistered(modelId, msg.sender, iotaStreamId);
@@ -88,6 +97,7 @@ contract ModelMarketplaceV2 {
     ) external {
         Model storage model = models[modelId];
         require(model.isActive, "Model not active");
+        require(model.ethicsApproved, "Model not ethically approved");
         require(iotaValidator.validateMessage(iotaMessageId), "Invalid IOTA message");
         
         // If using IOTA for feeless inference, skip payment
@@ -107,6 +117,16 @@ contract ModelMarketplaceV2 {
         daoGovernor = newDAO;
     }
     
+    function updateEthicsStatus(bytes32 modelId) external {
+        Model storage model = models[modelId];
+        require(model.isActive, "Model not active");
+        
+        bool approved = ethicsRegistry.isModelApproved(modelId);
+        model.ethicsApproved = approved;
+        
+        emit EthicsStatusUpdated(modelId, approved);
+    }
+    
     function getModelInfo(bytes32 modelId) external view returns (
         address owner,
         string memory metadata,
@@ -114,7 +134,8 @@ contract ModelMarketplaceV2 {
         bool isActive,
         uint256 totalUses,
         uint256 revenue,
-        string memory iotaStreamId
+        string memory iotaStreamId,
+        bool ethicsApproved
     ) {
         Model storage model = models[modelId];
         return (
@@ -124,7 +145,8 @@ contract ModelMarketplaceV2 {
             model.isActive,
             model.totalUses,
             model.revenue,
-            model.iotaStreamId
+            model.iotaStreamId,
+            model.ethicsApproved
         );
     }
     
