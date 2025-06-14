@@ -1,0 +1,48 @@
+# JSC (Joy Sovereign Coin) Configuration
+
+# Network configuration
+network:
+  testnet: false
+  mainnet: true
+  daemon_address: "127.0.0.1"
+  daemon_port: 18081
+
+# Bridge configuration
+bridge:
+  enabled: true
+  contract_address: ${JSC_BRIDGE_ADDRESS}
+  confirmation_blocks: 10
+  min_amount: 1000000000000 # 0.001 JSC
+  max_amount: 1000000000000000 # 1000 JSC
+
+# Privacy settings
+privacy:
+  ring_size: 11
+  outputs_per_tx: 2
+  default_priority: 2
+
+# Node settings
+node:
+  p2p_bind_ip: "0.0.0.0"
+  p2p_bind_port: 18080
+  rpc_bind_ip: "127.0.0.1"
+  rpc_bind_port: 18081
+  restricted_rpc: true
+  db_sync_mode: "fast:async:1000"
+
+# Wallet settings
+wallet:
+  auto_refresh: true
+  refresh_interval: 10
+  min_outputs_count: 5
+  min_outputs_value: 1000000000000 # 0.001 JSC
+  default_mixin: 11
+  default_priority: 2
+  auto_optimize: true
+
+# Logging
+logging:
+  level: "info"
+  console: true
+  file: true
+  log_file: "jsc.log"

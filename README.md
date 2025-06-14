@@ -6,6 +6,8 @@ This project implements a decentralized platform for AI model inference, using b
 
 - Smart Contracts
   - JoyToken (ERC20): Platform token for payments and staking
+  - JSC (Joy Sovereign Coin): Privacy-focused implementation for confidential transactions
+  - JSCBridge: Bridge between JoyToken and JSC for privacy features
   - ProofOfInference: Validates model execution with zero-knowledge proofs
   - ProofOfUse: Tracks model usage and rewards
   - NodeCoordinator: Manages edge computing nodes
@@ -53,6 +55,18 @@ node = InferenceNode(private_key, contract_address)
 result = node.execute_inference(model_id, input_data)
 ```
 
+3. Use JSC for private transactions:
+```python
+from src.jsc_bridge import JSCBridge
+
+# Convert JoyTokens to JSC
+bridge = JSCBridge(bridge_address)
+bridge.deposit_joy(amount, jsc_address)
+
+# Convert JSC back to JoyTokens
+bridge.withdraw_jsc(amount, joy_address, jsc_tx_hash)
+```
+
 ## Development
 
 Run tests:
@@ -76,9 +90,19 @@ pytest tests/
    - Results are validated by PoI system
    
 4. Payments and Rewards
-   - Users pay in JOY tokens for inference
+   - Users can pay in JOY tokens or JSC for inference
+   - JSC provides privacy for sensitive transactions
    - Node operators earn from execution fees
    - Model owners earn from usage fees
+   - Bridge enables seamless conversion between JOY and JSC
+
+## Privacy Features
+
+The JSC (Joy Sovereign Coin) integration provides:
+- Confidential transactions
+- Ring signatures for transaction privacy
+- Stealth addresses
+- Optional transparency through the bridge
 
 ## License
 
