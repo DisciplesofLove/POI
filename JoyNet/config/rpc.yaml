@@ -1,46 +1,57 @@
 ---
-# JoyNet Sovereign RPC Configuration
-
-# Network settings
 network:
-  name: "polygon-supernet"
-  chain_id: 1101
-  native_currency: "MATIC"
-  block_time: 2  # seconds
-
-# Node settings
-node:
   host: ${RPC_HOST}
-  port: ${RPC_PORT}
-  ws_enabled: true
-  http_enabled: true
-  max_connections: 1000
-  max_subscribers: 100
-
-# Security
-security:
   jwt_secret: ${JWT_SECRET}
   rate_limit:
     requests_per_second: 100
     burst: 200
-  allowed_origins:
-    - "https://*.joynet.io"
-    - "https://app.joynet.io"
+  security:
+    ssl_enabled: true
+    ssl_cert: ${SSL_CERT_PATH}
+    ssl_key: ${SSL_KEY_PATH}
+  monitoring:
+    enabled: true
+    health_check_interval: 300
+    metrics_port: 9090
+  iota:
+    enabled: true
+    node_url: ${IOTA_NODE_URL}
+    stream_validation: true
+
+nodes:
+  registration:
+    deposit_amount: 1000
+    min_reputation: 80
+  health:
+    check_interval: 60
+    threshold_score: 95
+    max_response_time: 1000
+
+security:
+  rate_limiting:
+    enabled: true
+    window: 60
+    max_requests: 1000
   ssl:
     enabled: true
     cert_path: ${SSL_CERT_PATH}
     key_path: ${SSL_KEY_PATH}
+  jwt:
+    enabled: true
+    secret: ${JWT_SECRET}
+    expiry: 3600
 
-# Performance
-performance:
-  cache_size_mb: 1024
-  max_blocks_behind: 100
-  sync_mode: "fast"
-  prune_mode: "archive"
-
-# Monitoring
 monitoring:
-  prometheus_enabled: true
-  metrics_port: 9090
-  log_level: "info"
-  health_check_port: 8545
+  prometheus:
+    enabled: true
+    port: 9090
+  alerting:
+    slack:
+      enabled: ${SLACK_ALERTS_ENABLED}
+      webhook: ${SLACK_WEBHOOK_URL}
+    email:
+      enabled: ${EMAIL_ALERTS_ENABLED}
+      smtp_host: ${SMTP_HOST}
+      smtp_port: ${SMTP_PORT}
+      from: ${ALERT_FROM_EMAIL}
+      to: ${ALERT_TO_EMAIL}

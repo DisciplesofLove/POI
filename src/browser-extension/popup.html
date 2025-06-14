@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Decentralized DNS Redirector</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    .enabled {
+      background-color: #dff0d8;
+      color: #3c763d;
+    }
+    .disabled {
+      background-color: #f2dede;
+      color: #a94442;
+    }
+  </style>
+</head>
+<body>
+  <h2>Decentralized DNS Settings</h2>
+  
+  <div class="form-group">
+    <label>
+      <input type="checkbox" id="enabled"> Enable DNS Redirection
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label for="dnsServer">DNS Resolver Endpoint:</label>
+    <input type="text" id="dnsServer" placeholder="http://localhost:8000/dns">
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

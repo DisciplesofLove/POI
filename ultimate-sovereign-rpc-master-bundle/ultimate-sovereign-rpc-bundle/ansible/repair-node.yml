@@ -1,0 +1,14 @@
+---
+- name: Auto-repair Out-of-Sync Node
+  hosts: target_node
+  become: true
+
+  tasks:
+    - name: Find healthy peer nodes
+      command: consul catalog services
+      register: peers
+
+    - name: Trigger state sync from peer
+      command: ./sync-geth.sh {{ item }}
+      loop: "{{ peers.stdout_lines }}"
+      when: "'healthy' in item"

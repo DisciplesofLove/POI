@@ -1,0 +1,61 @@
+# P2P Network Configuration
+
+# Node settings
+node:
+  host: 0.0.0.0
+  port: 4001
+  id_path: ~/.joynet/node_id  # Path to store node ID
+  max_connections: 50
+  connection_timeout: 30  # seconds
+
+# Discovery settings
+discovery:
+  bootstrap_peers:
+    - /ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ
+    - /ip4/104.131.131.83/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuK
+  mdns_enabled: true
+  dht_enabled: true
+  dht_interval: 300  # seconds
+
+# Security settings
+security:
+  tls_enabled: true
+  cert_path: ~/.joynet/certs
+  key_rotation_interval: 86400  # 24 hours in seconds
+  max_message_size: 1048576  # 1MB in bytes
+
+# Storage settings
+storage:
+  ipfs_host: localhost
+  ipfs_port: 5001
+  cache_size: 1073741824  # 1GB in bytes
+  max_pinned_items: 1000
+
+# Performance settings
+performance:
+  max_concurrent_requests: 100
+  request_timeout: 30  # seconds
+  batch_size: 50
+  max_retries: 3
+  retry_delay: 5  # seconds
+
+# Monitoring
+monitoring:
+  metrics_enabled: true
+  metrics_port: 9090
+  log_level: info
+  health_check_interval: 60  # seconds
+
+# Model execution
+model:
+  max_model_size: 5368709120  # 5GB in bytes
+  execution_timeout: 300  # seconds
+  max_gpu_memory: 8589934592  # 8GB in bytes
+  concurrent_executions: 4
+
+# Consensus
+consensus:
+  min_validators: 3
+  block_time: 15  # seconds
+  max_block_size: 5242880  # 5MB in bytes
+  stake_threshold: 1000  # minimum stake required for validation

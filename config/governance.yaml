@@ -1,0 +1,148 @@
+# JoyNet Governance Configuration
+
+# Root DAO Configuration
+root_dao:
+  name: "JoyNet Root DAO"
+  token_address: "${JOY_TOKEN_ADDRESS}"
+  governor_address: "${ROOT_GOVERNOR_ADDRESS}"
+  timelock_address: "${ROOT_TIMELOCK_ADDRESS}"
+  
+  # Voting parameters
+  voting:
+    delay: 172800  # 2 days
+    period: 604800  # 1 week
+    proposal_threshold: 100000000000000000000  # 100 JOY
+    quorum_numerator: 4  # 4% quorum
+    
+  # Execution parameters
+  execution:
+    timelock_delay: 172800  # 2 days
+    grace_period: 604800  # 1 week
+    
+  # Permissions
+  permissions:
+    - action: "UPDATE_PLATFORM_FEE"
+      required_support: 75  # 75% support required
+    - action: "UPDATE_RPC_LOGIC"
+      required_support: 80
+    - action: "UPDATE_TREASURY_ALLOCATION"
+      required_support: 70
+    - action: "APPROVE_TLD"
+      required_support: 60
+
+# TLD-Specific DAO Configuration
+tld_dao:
+  # DAO creation parameters
+  creation:
+    min_stake: 1000000000000000000000  # 1000 JOY
+    proposal_threshold: 10000000000000000000  # 10 JOY
+    
+  # Default voting parameters
+  voting:
+    delay: 86400  # 1 day
+    period: 432000  # 5 days
+    quorum_numerator: 10  # 10% quorum
+    
+  # Permissions
+  permissions:
+    - action: "UPDATE_DOMAIN_PRICING"
+      required_support: 60
+    - action: "UPDATE_PROOF_POLICY"
+      required_support: 70
+    - action: "RESOLVE_DISPUTE"
+      required_support: 75
+
+# Treasury Configuration
+treasury:
+  # Revenue allocation
+  allocation:
+    node_rewards: 40  # 40% to node operators
+    staking_rewards: 30  # 30% to stakers
+    development: 20  # 20% to development
+    community: 10  # 10% to community grants
+    
+  # Spending limits
+  spending_limits:
+    max_single_grant: 100000000000000000000000  # 100,000 JOY
+    daily_limit: 1000000000000000000000000  # 1M JOY
+    
+  # Grant programs
+  grants:
+    categories:
+      - name: "Core Development"
+        allocation: 40
+      - name: "Security Audits"
+        allocation: 20
+      - name: "Community Events"
+        allocation: 20
+      - name: "Education"
+        allocation: 20
+
+# Proposal Templates
+proposals:
+  templates:
+    - name: "Platform Fee Update"
+      description: "Update the platform fee percentage"
+      parameters:
+        - name: "new_fee"
+          type: "uint256"
+          validation: "range(0, 1000)"  # 0-10% with 0.01% precision
+          
+    - name: "RPC Logic Update"
+      description: "Update the RPC network logic"
+      parameters:
+        - name: "contract_address"
+          type: "address"
+        - name: "implementation_hash"
+          type: "bytes32"
+          
+    - name: "Treasury Allocation"
+      description: "Update treasury allocation percentages"
+      parameters:
+        - name: "node_rewards"
+          type: "uint256"
+        - name: "staking_rewards"
+          type: "uint256"
+        - name: "development"
+          type: "uint256"
+        - name: "community"
+          type: "uint256"
+
+# Incentive Structure
+incentives:
+  # Node operator rewards
+  node_rewards:
+    base_rate: 100  # Base reward rate
+    performance_multiplier: 120  # Up to 20% bonus for high performance
+    uptime_requirement: 99.9  # 99.9% uptime required
+    
+  # Staking rewards
+  staking_rewards:
+    base_apy: 500  # 5% base APY
+    bonus_multiplier: 150  # Up to 50% bonus for long-term staking
+    min_lock_period: 2592000  # 30 days minimum
+    
+  # Governance rewards
+  governance_rewards:
+    proposal_reward: 1000000000000000000  # 1 JOY for successful proposal
+    voting_reward: 100000000000000000  # 0.1 JOY for voting
+
+# Dispute Resolution
+disputes:
+  # Resolution process
+  process:
+    submission_fee: 1000000000000000000  # 1 JOY
+    review_period: 604800  # 1 week
+    appeal_period: 172800  # 2 days
+    
+  # Arbitration
+  arbitration:
+    min_arbitrators: 3
+    max_arbitrators: 7
+    selection_method: "random"  # random selection from qualified arbitrators
+    
+  # Penalties
+  penalties:
+    minor_violation: 10000000000000000000  # 10 JOY
+    major_violation: 100000000000000000000  # 100 JOY
+    critical_violation: 1000000000000000000000  # 1000 JOY

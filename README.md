@@ -1,13 +1,11 @@
-# Decentralized AI Inference Platform
+# JoyNet Unified Platform
 
-This project implements a decentralized platform for AI model inference, using blockchain for coordination and verification.
+A decentralized platform combining AI model marketplace, domain management, and RPC services with community governance features.
 
 ## Components
 
 - Smart Contracts
   - JoyToken (ERC20): Platform token for payments and staking
-  - JSC (Joy Sovereign Coin): Privacy-focused implementation for confidential transactions
-  - JSCBridge: Bridge between JoyToken and JSC for privacy features
   - ProofOfInference: Validates model execution with zero-knowledge proofs
   - ProofOfUse: Tracks model usage and rewards
   - NodeCoordinator: Manages edge computing nodes
@@ -25,26 +23,36 @@ This project implements a decentralized platform for AI model inference, using b
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
+cd unified-frontend
+npm install
+cd ..
 ```
 
-2. Deploy contracts:
+3. Set up environment variables:
 ```bash
-python scripts/deploy.py
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-3. Start an edge node:
+4. Start the decentralized node:
 ```bash
-python -m src.edge_node
+docker-compose -f deployment/docker-compose.yml up
 ```
 
-## Usage
+5. For development mode:
+```bash
+cd unified-frontend
+npm run dev
+```
 
-1. Register a model:
-```python
-from src.model_marketplace import ModelMarketplace
+For detailed deployment instructions, see [DECENTRALIZED_DEPLOYMENT.md](deployment/DECENTRALIZED_DEPLOYMENT.md)
 
-marketplace = ModelMarketplace(private_key, contract_address)
-marketplace.register_model(model_id, metadata, price)
+## Smart Contract Deployment
+
+1. Deploy the core contracts:
+```bash
+cd contracts
+npx hardhat run scripts/deploy.js --network <your-network>
 ```
 
 2. Execute inference:
@@ -53,18 +61,6 @@ from src.inference_node import InferenceNode
 
 node = InferenceNode(private_key, contract_address)
 result = node.execute_inference(model_id, input_data)
-```
-
-3. Use JSC for private transactions:
-```python
-from src.jsc_bridge import JSCBridge
-
-# Convert JoyTokens to JSC
-bridge = JSCBridge(bridge_address)
-bridge.deposit_joy(amount, jsc_address)
-
-# Convert JSC back to JoyTokens
-bridge.withdraw_jsc(amount, joy_address, jsc_tx_hash)
 ```
 
 ## Development
@@ -90,20 +86,10 @@ pytest tests/
    - Results are validated by PoI system
    
 4. Payments and Rewards
-   - Users can pay in JOY tokens or JSC for inference
-   - JSC provides privacy for sensitive transactions
+   - Users pay in JOY tokens for inference
    - Node operators earn from execution fees
    - Model owners earn from usage fees
-   - Bridge enables seamless conversion between JOY and JSC
-
-## Privacy Features
-
-The JSC (Joy Sovereign Coin) integration provides:
-- Confidential transactions
-- Ring signatures for transaction privacy
-- Stealth addresses
-- Optional transparency through the bridge
 
 ## License
 
-MIT
+Distributed under the MIT License. See `LICENSE` for more information.

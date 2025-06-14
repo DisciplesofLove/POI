@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Security infrastructure for PermaNet production deployment'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - production
+      - staging
+    Description: Environment name
+
+Resources:
+  SecretsManager:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '/${Environment}/permanet/credentials'
+      Description: 'Secrets for PermaNet application'
+
+  WAFWebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub 'permanet-${Environment}-waf'
+      Description: 'WAF rules for PermaNet'
+      Scope: REGIONAL
+      DefaultAction:
+        Allow: {}
+      Rules:
+        - Name: RateLimitRule
+          Priority: 1
+          Statement:
+            RateBasedStatement:
+              Limit: 2000
+              AggregateKeyType: IP
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitRuleMetric
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for PermaNet applications
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  SecretsManagerARN:
+    Description: ARN of the Secrets Manager secret
+    Value: !Ref SecretsManager
+  WAFWebACLArn:
+    Description: ARN of the WAF Web ACL
+    Value: !GetAtt WAFWebACL.Arn
+  SecurityGroupId:
+    Description: ID of the Security Group
+    Value: !Ref SecurityGroup

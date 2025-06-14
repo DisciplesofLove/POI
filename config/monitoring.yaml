@@ -1,0 +1,169 @@
+# JoyNet Monitoring Configuration
+
+# Prometheus Configuration
+prometheus:
+  enabled: true
+  port: 9090
+  retention_time: "15d"
+  scrape_interval: "15s"
+  evaluation_interval: "15s"
+  
+  # Alert rules
+  rules:
+    - name: "node_down"
+      expr: "up == 0"
+      for: "5m"
+      labels:
+        severity: critical
+    - name: "high_latency"
+      expr: "request_duration_seconds > 5"
+      for: "10m"
+      labels:
+        severity: warning
+    - name: "low_replication"
+      expr: "data_replication_factor < 3"
+      for: "1h"
+      labels:
+        severity: warning
+
+# Grafana Configuration
+grafana:
+  enabled: true
+  port: 3000
+  admin_user: "${GRAFANA_ADMIN}"
+  admin_password: "${GRAFANA_PASSWORD}"
+  
+  # Dashboards
+  dashboards:
+    - name: "Network Overview"
+      panels:
+        - title: "Active Nodes"
+          type: "gauge"
+          query: "count(up == 1)"
+        - title: "Total Data Stored"
+          type: "graph"
+          query: "sum(ipfs_repo_size_bytes)"
+        - title: "Network Latency"
+          type: "heatmap"
+          query: "rate(request_duration_seconds[5m])"
+        
+    - name: "Node Performance"
+      panels:
+        - title: "CPU Usage"
+          type: "graph"
+          query: "rate(process_cpu_seconds_total[5m])"
+        - title: "Memory Usage"
+          type: "graph"
+          query: "process_resident_memory_bytes"
+        - title: "Disk I/O"
+          type: "graph"
+          query: "rate(node_disk_io_time_seconds_total[5m])"
+        
+    - name: "Data Metrics"
+      panels:
+        - title: "Replication Factor"
+          type: "gauge"
+          query: "avg(data_replication_factor)"
+        - title: "Cache Hit Rate"
+          type: "graph"
+          query: "rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])"
+        - title: "Storage Growth"
+          type: "graph"
+          query: "delta(ipfs_repo_size_bytes[24h])"
+
+# Alerting Configuration
+alerting:
+  slack:
+    enabled: true
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#joynet-alerts"
+  
+  email:
+    enabled: true
+    smtp_host: "${SMTP_HOST}"
+    smtp_port: 587
+    from_address: "${ALERT_EMAIL}"
+    to_addresses: ["ops@joynet.com"]
+    
+  pagerduty:
+    enabled: true
+    service_key: "${PAGERDUTY_KEY}"
+    
+  # Alert routing
+  routes:
+    - match:
+        severity: critical
+      receivers: ["slack", "pagerduty"]
+    - match:
+        severity: warning
+      receivers: ["slack", "email"]
+
+# Logging Configuration
+logging:
+  level: INFO
+  format: "json"
+  output:
+    file: "/var/log/joynet/monitoring.log"
+    console: true
+    
+  # Log retention
+  retention:
+    files: 30
+    size: "1GB"
+    
+  # Structured logging fields
+  fields:
+    environment: "${ENV}"
+    region: "${REGION}"
+    node_id: "${NODE_ID}"
+
+# Metrics Configuration
+metrics:
+  # Node metrics
+  node:
+    - name: "node_uptime_seconds"
+      type: "gauge"
+      help: "Time since node started in seconds"
+    - name: "node_peers_count"
+      type: "gauge"
+      help: "Number of connected peers"
+    - name: "node_stake_amount"
+      type: "gauge"
+      help: "Amount of JOY tokens staked"
+      
+  # Data metrics
+  data:
+    - name: "data_stored_bytes"
+      type: "gauge"
+      help: "Total data stored in bytes"
+    - name: "data_replication_factor"
+      type: "gauge"
+      help: "Average data replication factor"
+    - name: "data_availability_ratio"
+      type: "gauge"
+      help: "Ratio of available data pieces"
+      
+  # Performance metrics
+  performance:
+    - name: "request_duration_seconds"
+      type: "histogram"
+      help: "Request duration in seconds"
+      buckets: [0.1, 0.5, 1, 2, 5]
+    - name: "cache_hit_ratio"
+      type: "gauge"
+      help: "Cache hit ratio"
+    - name: "rpc_errors_total"
+      type: "counter"
+      help: "Total RPC errors"
+      
+  # Economic metrics
+  economic:
+    - name: "platform_fees_collected"
+      type: "counter"
+      help: "Total platform fees collected in JOY"
+    - name: "node_rewards_distributed"
+      type: "counter"
+      help: "Total node rewards distributed in JOY"
+    - name: "staking_rewards_distributed"
+      type: "counter"
+      help: "Total staking rewards distributed in JOY"

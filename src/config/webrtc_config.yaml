@@ -1,0 +1,46 @@
+webrtc:
+  use_internal_servers: true  # Use our own STUN/TURN implementation
+  stun_servers:
+    - urls: 'stun:{host}:3478'  # Will be replaced with actual host
+  turn_servers:
+    - urls: 'turn:{host}:3479'  # Will be replaced with actual host
+      username: '{username}'     # Will be replaced with generated credentials
+      credential: '{password}'   # Will be replaced with generated credentials
+  ice_transport_policy: 'all'
+  bundle_policy: 'balanced'
+  rtcp_mux_policy: 'require'
+  ice_candidate_pool_size: 10
+  
+  # Storage configuration for messages and files
+  storage:
+    ipfs:
+      enabled: true
+      pin_files: true  # Keep files available
+      max_file_size: 104857600  # 100MB
+      allowed_mime_types:
+        - image/*
+        - application/pdf
+        - text/*
+        - application/msword
+        - application/vnd.openxmlformats-officedocument.*
+    
+    message_retention:
+      enabled: true
+      store_messages: true
+      encryption: true
+      max_age_days: 30  # How long to keep messages
+      
+  # AI analysis configuration
+  ai_analysis:
+    enabled: true
+    analyze_on_upload: true
+    supported_types:
+      - text/plain
+      - image/*
+      - application/pdf
+    features:
+      - content_moderation
+      - text_classification
+      - image_recognition
+      - document_analysis
+      - sentiment_analysis

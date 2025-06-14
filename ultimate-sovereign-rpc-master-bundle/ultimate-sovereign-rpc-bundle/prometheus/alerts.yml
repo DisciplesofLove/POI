@@ -1,0 +1,11 @@
+groups:
+- name: node-health
+  rules:
+  - alert: NodeLagging
+    expr: (geth_block_lag > 500) or (bor_block_lag > 500)
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Node is out of sync"
+      description: "Node {{ $labels.instance }} is {{ $value }} blocks behind."

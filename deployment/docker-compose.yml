@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Core P2P Node
+  p2p-node:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ID=${NODE_ID:-}
+      - BOOTSTRAP_PEERS=${BOOTSTRAP_PEERS:-}
+      - VAULT_PASSPHRASE=${VAULT_PASSPHRASE:-}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+    ports:
+      - "3000:3000"
+      - "4001:4001"
+    volumes:
+      - ipfs-data:/ipfs
+      - node-data:/data
+    restart: unless-stopped
+    command: ["python", "-m", "src.p2p.node_network"]
+
+  # IPFS Node
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ipfs-data:/data/ipfs
+    restart: unless-stopped
+
+  # Prometheus for monitoring (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ../config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  # Grafana for dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  ipfs-data:
+  node-data:
+  prometheus-data:
+  grafana-data:
