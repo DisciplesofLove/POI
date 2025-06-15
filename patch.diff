@@ -1,0 +1,206 @@
+diff --git a/src/cryptonote_basic/cryptonote_basic_impl.cpp b/src/cryptonote_basic/cryptonote_basic_impl.cpp
+--- a/src/cryptonote_basic/cryptonote_basic_impl.cpp
++++ b/src/cryptonote_basic/cryptonote_basic_impl.cpp
+@@ -83,47 +83,9 @@
+ bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version) {
+-    static_assert(DIFFICULTY_TARGET_V2%60==0&&DIFFICULTY_TARGET_V1%60==0,"difficulty targets must be a multiple of 60");
+-    const int target = version < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
+-    const int target_minutes = target / 60;
+-    const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
+-
+-    uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
+-    if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
+-    {
+-      base_reward = FINAL_SUBSIDY_PER_MINUTE*target_minutes;
+-    }
+-
+-    uint64_t full_reward_zone = get_min_block_weight(version);
+-
+-    //make it soft
+-    if (median_weight < full_reward_zone) {
+-      median_weight = full_reward_zone;
+-    }
+-
+-    if (current_block_weight <= median_weight) {
+-      reward = base_reward;
+-      return true;
+-    }
+-
+-    if(current_block_weight > 2 * median_weight) {
+-      MERROR("Block cumulative weight is too big: " << current_block_weight << ", expected less than " << 2 * median_weight);
+-      return false;
+-    }
+-
+-    uint64_t product_hi;
+-    // BUGFIX: 32-bit saturation bug (e.g. ARM7), the result was being
+-    // treated as 32-bit by default.
+-    uint64_t multiplicand = 2 * median_weight - current_block_weight;
+-    multiplicand *= current_block_weight;
+-    uint64_t product_lo = mul128(base_reward, multiplicand, &product_hi);
+-
+-    uint64_t reward_hi;
+-    uint64_t reward_lo;
+-    div128_64(product_hi, product_lo, median_weight, &reward_hi, &reward_lo, NULL, NULL);
+-    div128_64(reward_hi, reward_lo, median_weight, &reward_hi, &reward_lo, NULL, NULL);
+-    assert(0 == reward_hi);
+-    assert(reward_lo < base_reward);
+-
+-    reward = reward_lo;
++    // No mining rewards in JOY
++    reward = 0;
+     return true;
+ }
+
+diff --git a/src/cryptonote_basic/difficulty.cpp b/src/cryptonote_basic/difficulty.cpp
+--- a/src/cryptonote_basic/difficulty.cpp
++++ b/src/cryptonote_basic/difficulty.cpp
+@@ -104,136 +104,27 @@
+ bool check_hash_64(const crypto::hash &hash, uint64_t difficulty) {
+-    uint64_t low, high, top, cur;
+-    // First check the highest word, this will most likely fail for a random hash.
+-    mul(swap64le(((const uint64_t *) &hash)[3]), difficulty, top, high);
+-    if (high != 0) {
+-      return false;
+-    }
+-    mul(swap64le(((const uint64_t *) &hash)[0]), difficulty, low, cur);
+-    mul(swap64le(((const uint64_t *) &hash)[1]), difficulty, low, high);
+-    bool carry = cadd(cur, low);
+-    cur = high;
+-    mul(swap64le(((const uint64_t *) &hash)[2]), difficulty, low, high);
+-    carry = cadc(cur, low, carry);
+-    carry = cadc(high, top, carry);
+-    return !carry;
++    return true;
+ }
+
+ uint64_t next_difficulty_64(std::vector<std::uint64_t> timestamps, std::vector<uint64_t> cumulative_difficulties, size_t target_seconds) {
+-    if(timestamps.size() > DIFFICULTY_WINDOW)
+-    {
+-      timestamps.resize(DIFFICULTY_WINDOW);
+-      cumulative_difficulties.resize(DIFFICULTY_WINDOW);
+-    }
+-
+-    size_t length = timestamps.size();
+-    assert(length == cumulative_difficulties.size());
+-    if (length <= 1) {
+-      return 1;
+-    }
+-    static_assert(DIFFICULTY_WINDOW >= 2, "Window is too small");
+-    assert(length <= DIFFICULTY_WINDOW);
+-    sort(timestamps.begin(), timestamps.end());
+-    size_t cut_begin, cut_end;
+-    static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Cut length is too large");
+-    if (length <= DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT) {
+-      cut_begin = 0;
+-      cut_end = length;
+-    } else {
+-      cut_begin = (length - (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT) + 1) / 2;
+-      cut_end = cut_begin + (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT);
+-    }
+-    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+-    uint64_t time_span = timestamps[cut_end - 1] - timestamps[cut_begin];
+-    if (time_span == 0) {
+-      time_span = 1;
+-    }
+-    uint64_t total_work = cumulative_difficulties[cut_end - 1] - cumulative_difficulties[cut_begin];
+-    assert(total_work > 0);
+-    uint64_t low, high;
+-    mul(total_work, target_seconds, low, high);
+-    // blockchain errors "difficulty overhead" if this function returns zero.
+-    // TODO: consider throwing an exception instead
+-    if (high != 0 || low + time_span - 1 < low) {
+-      return 0;
+-    }
+-    return (low + time_span - 1) / time_span;
++    return 1;
+ }
+
+ bool check_hash_128(const crypto::hash &hash, difficulty_type difficulty) {
+-    boost::multiprecision::uint512_t hashVal = 0;
+-    for(int i = 0; i < 4; i++) {
+-      hashVal <<= 64;
+-      hashVal |= swap64le(((const uint64_t *) &hash)[3 - i]);
+-    }
+-    return hashVal * difficulty <= max256bit;
++    return true;
+ }
+
+ bool check_hash(const crypto::hash &hash, difficulty_type difficulty) {
+-    if (difficulty <= max64bit)
+-      return check_hash_64(hash, difficulty.convert_to<std::uint64_t>());
+-    else
+-      return check_hash_128(hash, difficulty);
++    return true;
+ }
+
+ difficulty_type next_difficulty(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+-    //cutoff DIFFICULTY_LAG
+-    if(timestamps.size() > DIFFICULTY_WINDOW)
+-    {
+-      timestamps.resize(DIFFICULTY_WINDOW);
+-      cumulative_difficulties.resize(DIFFICULTY_WINDOW);
+-    }
+-
+-    size_t length = timestamps.size();
+-    assert(length == cumulative_difficulties.size());
+-    if (length <= 1) {
+-      return 1;
+-    }
+-    static_assert(DIFFICULTY_WINDOW >= 2, "Window is too small");
+-    assert(length <= DIFFICULTY_WINDOW);
+-    sort(timestamps.begin(), timestamps.end());
+-    size_t cut_begin, cut_end;
+-    static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Cut length is too large");
+-    if (length <= DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT) {
+-      cut_begin = 0;
+-      cut_end = length;
+-    } else {
+-      cut_begin = (length - (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT) + 1) / 2;
+-      cut_end = cut_begin + (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT);
+-    }
+-    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+-    uint64_t time_span = timestamps[cut_end - 1] - timestamps[cut_begin];
+-    if (time_span == 0) {
+-      time_span = 1;
+-    }
+-    difficulty_type total_work = cumulative_difficulties[cut_end - 1] - cumulative_difficulties[cut_begin];
+-    assert(total_work > 0);
+-    boost::multiprecision::uint256_t res =  (boost::multiprecision::uint256_t(total_work) * target_seconds + time_span - 1) / time_span;
+-    if(res > max128bit)
+-      return 0; // to behave like previous implementation, may be better return max128bit?
+-    return res.convert_to<difficulty_type>();
++    return 1;
+ }
+
+ std::string hex(difficulty_type v)
+ {
+-    static const char chars[] = "0123456789abcdef";
+-    std::string s;
+-    while (v > 0)
+-    {
+-      s.push_back(chars[(v & 0xf).convert_to<unsigned>()]);
+-      v >>= 4;
+-    }
+-    if (s.empty())
+-      s += "0";
+-    std::reverse(s.begin(), s.end());
+-    return "0x" + s;
++    return "0x1";
+ }
+
+diff --git a/src/cryptonote_config.h b/src/cryptonote_config.h
+--- a/src/cryptonote_config.h
++++ b/src/cryptonote_config.h
+@@ -51,9 +51,9 @@
+ #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
+ 
+ // MONEY_SUPPLY - total number coins to be generated
+-#define MONEY_SUPPLY                                    ((uint64_t)(-1))
+-#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
+-#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
++#define MONEY_SUPPLY                                    ((uint64_t)1000000000000000) // 1B JOY tokens with 12 decimals
++#define EMISSION_SPEED_FACTOR_PER_MINUTE                (0) // No emission
++#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)0) // No subsidy
+
+ #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
+ #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
