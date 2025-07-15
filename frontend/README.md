@@ -1,40 +1,49 @@
-# JoyNet Integration for Lovable Frontend
+# JoyNet Blockchain Integration for Lovable
 
-## Quick Setup
+## Setup for Your Lovable Project
 
-1. **Install in your Lovable project**:
+1. **Copy integration file**:
+```bash
+cp frontend/lovable-integration.ts your-lovable-project/src/lib/
+```
+
+2. **Install ethers in your Lovable project**:
 ```bash
 npm install ethers
 ```
 
-2. **Copy integration file** to your Lovable project:
+3. **Deploy contracts first**:
 ```bash
-cp lovable-integration.ts /path/to/your/lovable/project/src/
+npx hardhat run scripts/deploy_integrated_system.js --network mainnet
 ```
 
-3. **Use in your Lovable components**:
+4. **Use in Lovable components**:
 ```typescript
-import { initJoyNet } from './lovable-integration';
+import { initJoyNet, MAINNET_CONTRACTS } from './lib/lovable-integration';
 
-const joynet = initJoyNet({
-  LoveViceScore: "0x...",
-  AgentMarketplace: "0x...", 
-  LiquidDemocracy: "0x...",
-  SelfHealingOrchestrator: "0x...",
-  ZKVerifier: "0x..."
-});
+const joynet = initJoyNet(MAINNET_CONTRACTS);
 
-// Get user reputation
+// Connect wallet
+const userAddress = await joynet.connectWallet();
+
+// Get user data
 const userData = await joynet.getUserData(userAddress);
 
-// Register AI agent
-await joynet.registerAgent("agent1", "AI Assistant", "10", ["nlp", "vision"]);
+// Register agent
+await joynet.registerAgent("agent1", "AI Assistant", "10", ["nlp"]);
 
-// Create governance proposal
-await joynet.createProposal("proposal1", "Increase platform fee", 86400);
+// Request task
+await joynet.requestTask("task1", "Need help", "50", Date.now() + 3600000);
+
+// Create proposal
+await joynet.createProposal("prop1", "New feature", 86400);
+
+// Vote
+await joynet.vote("prop1", true);
+
+// Create agent flow
+await joynet.createFlow("flow1", [agentAddress], [0], true);
 ```
 
-## Contract Addresses (Deploy first)
-Run: `npx hardhat run scripts/deploy_integrated_system.js`
-
-## Ready for Production ✅
+## All Frontend Code Cleaned ✅
+Old React/Next.js frontends removed. Only blockchain integration remains.
