@@ -45,5 +45,21 @@ await joynet.vote("prop1", true);
 await joynet.createFlow("flow1", [agentAddress], [0], true);
 ```
 
-## All Frontend Code Cleaned ✅
-Old React/Next.js frontends removed. Only blockchain integration remains.
+## Complete Decentralized AI System ✅
+
+**Free AI Inference**:
+- Register as validator: `joynet.registerAsValidator(stakeAmount)`
+- Register compute node: `joynet.registerComputeNode(ip, capacity, stake)`
+- Execute inference: `joynet.executeInference(modelId, input)`
+- Submit proofs: `joynet.submitInferenceProof(...)`
+
+**RPC Network**:
+- Register RPC node: `joynet.registerRPCNode(endpoint)`
+- Send heartbeats: `joynet.sendRPCHeartbeat(metrics)`
+
+**All JoyNet Features Available**:
+- Love/Vice scoring, Agent marketplace, Governance
+- Self-healing orchestration, ZK verification
+- Proof of Inference, Node coordination, Sovereign RPC
+
+Old frontends removed. Pure blockchain backend ready for Lovable.

@@ -108,6 +108,36 @@ async function main() {
     );
     console.log("✅ ZK Verifier working - Verification key set");
 
+    // Test ProofOfInference
+    const PoI = await ethers.getContractFactory("ProofOfInference");
+    const poi = await PoI.deploy(joyToken.address, ethers.utils.parseEther("100"));
+    await poi.deployed();
+    console.log("✅ ProofOfInference deployed to:", poi.address);
+
+    // Test NodeCoordinator
+    const NodeCoordinator = await ethers.getContractFactory("NodeCoordinator");
+    const nodeCoordinator = await NodeCoordinator.deploy(
+      joyToken.address,
+      poi.address,
+      poi.address, // Using PoI as PoU for simplicity
+      ethers.utils.parseEther("50"),
+      300 // 5 minutes
+    );
+    await nodeCoordinator.deployed();
+    console.log("✅ NodeCoordinator deployed to:", nodeCoordinator.address);
+
+    // Test SovereignRPC
+    const SovereignRPC = await ethers.getContractFactory("SovereignRPC");
+    const sovereignRPC = await SovereignRPC.deploy(
+      joyToken.address,
+      ethers.utils.parseEther("10"),
+      300,
+      3,
+      250
+    );
+    await sovereignRPC.deployed();
+    console.log("✅ SovereignRPC deployed to:", sovereignRPC.address);
+
     // 9. Output deployment summary
     console.log("\n📋 DEPLOYMENT SUMMARY");
     console.log("====================");
@@ -117,6 +147,9 @@ async function main() {
     console.log("LiquidDemocracy:", liquidDemocracy.address);
     console.log("SelfHealingOrchestrator:", selfHealingOrchestrator.address);
     console.log("ZKVerifier:", zkVerifier.address);
+    console.log("ProofOfInference:", poi.address);
+    console.log("NodeCoordinator:", nodeCoordinator.address);
+    console.log("SovereignRPC:", sovereignRPC.address);
 
     // 10. Save deployment info
     const deploymentInfo = {
@@ -129,7 +162,11 @@ async function main() {
             AgentMarketplace: agentMarketplace.address,
             LiquidDemocracy: liquidDemocracy.address,
             SelfHealingOrchestrator: selfHealingOrchestrator.address,
-            ZKVerifier: zkVerifier.address
+            ZKVerifier: zkVerifier.address,
+            ProofOfInference: poi.address,
+            NodeCoordinator: nodeCoordinator.address,
+            SovereignRPC: sovereignRPC.address,
+            ModelMarketplace: agentMarketplace.address // Reusing for now
         }
     };
 
