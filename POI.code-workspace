@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "POI",
+			"path": "."
+		}
+	],
+	"settings": {
+		"cmake.sourceDirectory": "E:/Love AI/POI/JSC/JOY-SOVEREIGN-COIN-JSC-/src/wallet/api"
+	}
+}
